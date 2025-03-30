@@ -1,0 +1,118 @@
+name: Blu3PrintPlugin
+version: '1.0-SNAPSHOT'
+main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
+api-version: '1.21'
+prefix: Blu3PrintPlugin
+authors: [ bl3rune ]
+description: Blu3PrintPlugin
+website: https://github.com/bl3rune
+commands:
+  blu3print:
+    description: Blu3PrintPlugin usage
+    usage: /<command>
+    permission: blu3print
+    permission-message: You don't have permission to do this
+    aliases: [ blu3 ]
+  blu3print.duplicate:
+    description: Duplicate the Blu3Print currently held (If a blank Blu3Print is in inventory)
+    usage: /<command>
+    permission: blu3print.duplicate
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.duplicate ]
+  blu3print.rotate:
+    description: Rotate the Blu3Print currently held
+    usage: /<command> <#optional# rotation> (default next rotation)
+    permission: blu3print.rotate
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.rotate ]
+  blu3print.face:
+    description: Change the direction of the Blu3Print currently held
+    usage: /<command> <#optional# direction> (default next face)
+    permission: blu3print.face
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.face ]
+  blu3print.import:
+    description: Import a Blu3Print from a string to the current held Blu3Print
+    usage: /<command> <name> <encodedString>
+    permission: blu3print.import
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.import ]
+  blu3print.export:
+    description: Export the Blu3Print currently held to a string
+    usage: /<command>
+    permission: blu3print.export
+    aliases: [ blu3.export ]
+  blu3print.scale:
+    description: Change the scale of the Blu3Print currently held
+    usage: /<command> <#optional# scale> (default current * 2)
+    permission: blu3print.scale
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.scale ]
+  blu3print.name:
+    description: Set the name of the Blu3Print currently held
+    usage: /<command> <name>
+    permission: blu3print.name
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.name ]
+  blu3print.give:
+    description: Gives player a blu3print
+    usage: /<command> <#optional# player>
+    permission: blu3print.give
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.give ]
+  blu3print.help:
+    description: Get help for Blu3PrintPlugin
+    usage: /<command>
+    permission: blu3print.help
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.help ]
+permissions:
+  blu3print.*:
+    description: Allowed to use all Blu3PrintPlugin commands
+    children:
+      blu3print: true
+      blu3print.duplicate: true
+      blu3print.rotate: true
+      blu3print.face: true
+      blu3print.import: true
+      blu3print.export: true
+      blu3print.scale: true
+      blu3print.no-scale-limit: true
+      blu3print.name: true
+      blu3print.give: true
+      blu3print.help: true
+  blu3print.basics:
+    description: Allowed to use Blu3Prints
+    default: not op
+    children:
+      blu3print: true
+      blu3print.duplicate: true
+      blu3print.rotate: true
+      blu3print.face: true
+      blu3print.import: true
+      blu3print.export: true
+      blu3print.scale: true
+      blu3print.name: true
+      blu3print.help: true
+  blu3print:
+    description: Allowed to get Blu3PrintPlugin usage
+  blu3print.duplicate:
+    description: Allowed to duplicate the complete Blu3Print currently held
+  blu3print.rotate:
+    description: Allowed to rotate the Blu3Print currently held
+  blu3print.face:
+    description: Allowed to change the direction of the Blu3Print currently held
+  blu3print.import:
+    description: Allowed to import a Blu3Print from a string  
+  blu3print.export:
+    description: Allowed to export the Blu3Print currently held
+  blu3print.scale:
+    description: Allowed to change the scale of the Blu3Print currently held
+  blu3print.no-scale-limit:
+    description: No restrictions on scaling of Blu3prints
+  blu3print.name:
+    description: Allowed to set the name of the Blu3Print currently held
+  blu3print.give:
+    description: Allowed to give blank Blu3prints
+  blu3print.help:
+    description: Allowed to ask for help with the Blu3PrintPlugin

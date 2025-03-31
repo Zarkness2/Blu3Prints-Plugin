@@ -13,8 +13,8 @@ Features
 - Craftable Blu3print writer item with customisable recipe
 - Area selection method to copy block within selection
 - Blu3print Writer is based on writable book project and so encoded Blu3prints can be imported directly using the book
-- Blu3prints are namable to allow for at-a-glance visibility
-- Blu3print UUID strucute allows less overhead for server operators for storing large quantities of blu3prints
+- Blu3prints are nameable to allow for at-a-glance visibility
+- Blu3print UUID structure allows less overhead for server operators for storing large quantities of blu3prints
 - Ability for any Blu3print to be exported and shared as text; e.g.  `B=STONE|2:3:1|E-0-1~BA|B|`
 - Blu3print items can be manipulated in a number of ways
     - **Rotated around blockface**
@@ -63,9 +63,12 @@ It can also be used to rename or export the blu3print.
 It also has a button to open the in-game help manual.
 ![Menu](/images/Menu.png "Menu")
 
-### Exporting 
+### Exporting & Importing
 Blu3prints can be exported by using a cartography table or by using the `blu3print.export` command whilst holding the blu3print item.
 ![Export](/images/Export.png "Export")
+This code can be shared to other players and even be used on other servers running this plugin, allowing you to preserve your creations across servers or even showcase them online (visualiser website in the pipeline!)
+To use the encoded blu3prints, simply run the command `/blu3print.import <name> <encoded-string>`
+
 
 ### Permissions
 By default all commands apart from `/blu3print.give` should be available for all non OP players.

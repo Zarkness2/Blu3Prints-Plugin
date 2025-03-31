@@ -5,11 +5,14 @@
 
 **Allows players to copy/paste/export/import blocks using blu3prints and using blocks in inventory** (or for free if in creative mode)
 
+[![Watch the video](https://img.youtube.com/vi/iNgYVwC9tRA/maxresdefault.jpg)](https://www.youtube.com/watch?v=iNgYVwC9tRA)
+
+
 Features
 --------
-- Craftable Blu3print writer item with customisable recipie
+- Craftable Blu3print writer item with customisable recipe
 - Area selection method to copy block within selection
-- Blu3print Writer is based on writable book boject and so encoded Blu3prints can be imported directly using the book
+- Blu3print Writer is based on writable book project and so encoded Blu3prints can be imported directly using the book
 - Blu3prints are namable to allow for at-a-glance visibility
 - Blu3print UUID strucute allows less overhead for server operators for storing large quantities of blu3prints
 - Ability for any Blu3print to be exported and shared as text; e.g.  `B=STONE|2:3:1|E-0-1~BA|B|`
@@ -78,7 +81,7 @@ the server.
 Configuration can be found in the `config.yml` file. 
 - `blu3print.max-scale` - Maximum scale of blu3print (default 10)
 - `blu3print.cooldown` - Minimum time in milliseconds between using Blu3print items / writer
-- `blu3print.recipie.ingredients` - Customisable list of ingredients used in crafting the blu3print writer
+- `blu3print.recipe.ingredients` - Customisable list of ingredients used in crafting the blu3print writer
 
 
 License

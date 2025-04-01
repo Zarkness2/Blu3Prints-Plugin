@@ -77,6 +77,7 @@ permissions:
       blu3print.import: true
       blu3print.export: true
       blu3print.scale: true
+      blu3print.no-size-limit: true
       blu3print.no-scale-limit: true
       blu3print.name: true
       blu3print.give: true
@@ -108,6 +109,8 @@ permissions:
     description: Allowed to export the Blu3Print currently held
   blu3print.scale:
     description: Allowed to change the scale of the Blu3Print currently held
+  blu3print.no-size-limit:
+    description: No restrictions on size of Blu3prints
   blu3print.no-scale-limit:
     description: No restrictions on scaling of Blu3prints
   blu3print.name:

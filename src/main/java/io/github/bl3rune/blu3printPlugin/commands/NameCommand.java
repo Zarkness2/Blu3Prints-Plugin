@@ -15,7 +15,8 @@ public class NameCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             if (args.length < 1) {
                 sender.sendMessage("You must provide a name for the blu3print");
                 return false;

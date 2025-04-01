@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,7 +49,8 @@ public class CapturedBlu3printData extends Blu3printData {
                     } else {
                         BlockFace face = null;
                         String blockName = block.getType().name();
-                        if (block instanceof Directional directional) {
+                        if (block instanceof Directional) {
+                            Directional directional = (Directional) block;
                             Orientation orientation = Orientation.getOrientation(directional.getFacing());
                             face = orientation.getBlockFace();
                             blockName = orientation.getDescription() + MODIFIER + blockName;
@@ -74,7 +76,7 @@ public class CapturedBlu3printData extends Blu3printData {
         
         positions = positions.parallelStream().map(p -> do3dLoop(p)).sorted(
             (p1,p2) -> Integer.compare(p1.getEncoding().length(), p2.getEncoding().length())
-        ).toList();
+        ).collect(Collectors.toList());
 
         this.position = positions.get(0);
         header = buildHeaderWithPerspective(header);
@@ -90,7 +92,7 @@ public class CapturedBlu3printData extends Blu3printData {
         // Sorted so most common keys are lower
         List<String> sortedKeys = ingredientsCountWithDirection.entrySet().stream().sorted(
             (o1, o2) -> o2.getValue().compareTo(o1.getValue())
-        ).map(i -> i.getKey()).toList();
+        ).map(i -> i.getKey()).collect(Collectors.toList());
 
         for (String i : sortedKeys) {
             if (index > 1 || secondCharIndex >= 0) {

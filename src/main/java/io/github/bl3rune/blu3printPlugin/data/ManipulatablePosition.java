@@ -1,8 +1,11 @@
 package io.github.bl3rune.blu3printPlugin.data;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
@@ -74,7 +77,7 @@ public class ManipulatablePosition {
         this.orientation = o;
         this.rotation = r;
         this.scale = scale;
-        this.ordering = calculateOrdering(o,r);
+        this.ordering = calculateOrdering(o, r);
     }
 
     public int getXSize() {
@@ -122,15 +125,15 @@ public class ManipulatablePosition {
     public MaterialData[][][] reorientSelectionGrid(MaterialData[][][] oldGrid, Orientation o, Rotation r) {
         Dimension[] newOrdering = calculateOrdering(o, r);
         Function<Integer[], Integer[]> converter = buildConversionFunction(newOrdering);
-        Integer [] sizes = converter.apply(new Integer[] {zMax,yMax,xMax});
+        Integer[] sizes = converter.apply(new Integer[] { zMax, yMax, xMax });
 
         MaterialData[][][] newGrid = new MaterialData[sizes[0]][sizes[1]][sizes[2]];
-        
+
         for (int z = 0; z < zMax; z++) {
             for (int y = 0; y < yMax; y++) {
                 for (int x = 0; x < xMax; x++) {
                     MaterialData data = oldGrid[z][y][x];
-                    Integer [] converted = converter.apply(new Integer[] {z,y,x,0});
+                    Integer[] converted = converter.apply(new Integer[] { z, y, x, 0 });
                     newGrid[converted[0]][converted[1]][converted[2]] = data;
                 }
             }
@@ -138,33 +141,33 @@ public class ManipulatablePosition {
         return newGrid;
     }
 
-    private Function<Integer[],Integer[]> buildConversionFunction(Dimension[] newOrdering) {
+    private Function<Integer[], Integer[]> buildConversionFunction(Dimension[] newOrdering) {
         Dimension dimz = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 0).findFirst().get();
         Dimension dimy = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 1).findFirst().get();
         Dimension dimx = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 2).findFirst().get();
 
-        int [] reordered = new int[3];
+        int[] reordered = new int[3];
 
         for (int i = 0; i < 3; i++) {
             reordered[ordering[i].getPosIndex()] = newOrdering[i].getPosIndex();
         }
-        
+
         boolean flippedZ = Arrays.stream(newOrdering).noneMatch(o -> dimz == o);
         boolean flippedY = Arrays.stream(newOrdering).noneMatch(o -> dimy == o);
         boolean flippedX = Arrays.stream(newOrdering).noneMatch(o -> dimx == o);
 
         return (coords) -> { // as [z][y][x] for sizes [z][y][x][0] for coordinates
-            Integer [] signedCoords = new Integer[3];
-            boolean allowNegative =  coords.length > 3;
+            Integer[] signedCoords = new Integer[3];
+            boolean allowNegative = coords.length > 3;
 
             signedCoords[0] = (allowNegative && flippedZ) ? zMax - coords[0] - 1 : coords[0];
             signedCoords[1] = (allowNegative && flippedY) ? yMax - coords[1] - 1 : coords[1];
             signedCoords[2] = (allowNegative && flippedX) ? xMax - coords[2] - 1 : coords[2];
-            return new Integer[] { 
-                    signedCoords[reordered[0]], 
-                    signedCoords[reordered[1]], 
-                    signedCoords[reordered[2]] 
-                }; // as new arrangement
+            return new Integer[] {
+                    signedCoords[reordered[0]],
+                    signedCoords[reordered[1]],
+                    signedCoords[reordered[2]]
+            }; // as new arrangement
         };
     }
 
@@ -239,7 +242,7 @@ public class ManipulatablePosition {
      *          DOWN = Y- Z- X- UP = Y+ Z+ X+
      *          NORTH = Z- Y+ X- SOUTH = Z+ Y+ X+
      */
-    private Dimension[] calculateOrdering(Orientation o, Rotation r)  {
+    private Dimension[] calculateOrdering(Orientation o, Rotation r) {
         Dimension[] order = new Dimension[3];
         switch (o) {
             case WEST:
@@ -258,7 +261,8 @@ public class ManipulatablePosition {
         }
     }
 
-    private Dimension[] innerOrdering(Dimension outer, Dimension middle, Dimension inner, Rotation r, Dimension[] order) {
+    private Dimension[] innerOrdering(Dimension outer, Dimension middle, Dimension inner, Rotation r,
+            Dimension[] order) {
         boolean isLeft = Rotation.LEFT == r;
         boolean isTop = Rotation.TOP == r;
         order[2] = outer;
@@ -296,20 +300,24 @@ public class ManipulatablePosition {
 
         switch (dimension) {
             case X_PLUS:
-                return IntStream.range(0, scaled ? xMax * scale : xMax).boxed().toList().iterator();
             case X_MINUS:
-                return IntStream.range(0, scaled ? xMax * scale : xMax).boxed().toList().reversed().iterator();
+                return generateList((scaled ? xMax * scale : xMax), dimension == Dimension.X_MINUS).iterator();
             case Y_PLUS:
-                return IntStream.range(0, scaled ? yMax * scale : yMax).boxed().toList().iterator();
             case Y_MINUS:
-                return IntStream.range(0, scaled ? yMax * scale : yMax).boxed().toList().reversed().iterator();
+                return generateList((scaled ? yMax * scale : yMax), dimension == Dimension.Y_MINUS).iterator();
             case Z_PLUS:
-                return IntStream.range(0, scaled ? zMax * scale : zMax).boxed().toList().iterator();
             case Z_MINUS:
-                return IntStream.range(0, scaled ? zMax * scale : zMax).boxed().toList().reversed().iterator();
             default:
-                return null;
+                return generateList((scaled ? zMax * scale : zMax), dimension == Dimension.Z_MINUS).iterator();
         }
+    }
+
+    private List<Integer> generateList(int end, boolean reversed) {
+        List<Integer> list = IntStream.range(0, end).boxed().collect(Collectors.toList());
+        if (reversed) {
+            Collections.reverse(list);
+        }
+        return list;
     }
 
     /**

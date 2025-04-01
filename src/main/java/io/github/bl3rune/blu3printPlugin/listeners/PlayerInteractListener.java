@@ -26,7 +26,7 @@ import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
 
 public class PlayerInteractListener implements Listener {
 
-    private static final List<Material> IGNORE_BLOCKS = List.of(Material.LECTERN, Material.CHISELED_BOOKSHELF);
+    private static final List<Material> IGNORE_BLOCKS = List.of(Material.LECTERN);
     private static Map<String, Long> lastInteractionPerPlayer = new HashMap<>();
     private static Long cooldown;
     private Blu3PrintPlugin instance;

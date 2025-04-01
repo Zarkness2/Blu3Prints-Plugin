@@ -21,7 +21,8 @@ public class Blu3printCommand implements CommandExecutor {
      
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             if  (inventory == null) {
                 inventory = Bukkit.createInventory(player, 9, BLU3PRINT_MENU_STRING);
 

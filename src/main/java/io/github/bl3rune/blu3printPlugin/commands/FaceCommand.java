@@ -16,7 +16,8 @@ public class FaceCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             ItemStack item = InventoryUtils.getHeldBlu3print(player, false);
             if (item == null) {
                 sender.sendMessage("You must be holding a blu3print to change what side faces you");

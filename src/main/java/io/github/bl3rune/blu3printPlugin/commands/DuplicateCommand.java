@@ -12,7 +12,8 @@ public class DuplicateCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             ItemStack blu3print = InventoryUtils.getHeldBlu3print(player, false);
             if (blu3print == null) {
                 sender.sendMessage("You must be holding a blu3print to duplicate it.");

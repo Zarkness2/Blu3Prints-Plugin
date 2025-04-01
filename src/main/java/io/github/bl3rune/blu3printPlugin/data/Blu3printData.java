@@ -154,10 +154,12 @@ public abstract class Blu3printData {
             logger().info("World not found: " + location.getWorld().getName());
             return false;
         }
+        
         world.setType(location, materialData.getMaterial());
         if (materialData.getFace() != null) {
             BlockData blockData = world.getBlockData(location);
-            if (blockData instanceof Rotatable rotatable) {
+            if (blockData instanceof Rotatable) {
+                Rotatable rotatable = (Rotatable) blockData;
                 rotatable.setRotation(materialData.getFace());
                 world.setBlockData(location, rotatable);
             }
@@ -186,8 +188,13 @@ public abstract class Blu3printData {
                     inventoryIndex++;
                     continue;
                 }
-                if (itemStack.getItemMeta() instanceof BlockStateMeta bsm && bsm.getBlockState() instanceof Container) {
-                    storageBlocks.put(inventoryIndex, itemStack);
+                if (itemStack.getItemMeta() instanceof BlockStateMeta) {
+                    BlockStateMeta bsm = (BlockStateMeta) itemStack;
+                    if (bsm.getBlockState() instanceof Container) {
+                        storageBlocks.put(inventoryIndex, itemStack);
+                    } else {
+                        inventoryBlocks.put(inventoryIndex, itemStack);
+                    }
                 } else {
                     inventoryBlocks.put(inventoryIndex, itemStack);
                 }

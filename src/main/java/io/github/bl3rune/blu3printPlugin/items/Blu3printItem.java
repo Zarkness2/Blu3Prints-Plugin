@@ -69,7 +69,8 @@ public class Blu3printItem extends ItemStack {
 
     public static List<String> getPages(ItemStack blu3Print) {
         ItemMeta meta = blu3Print.getItemMeta();
-        if (meta instanceof BookMeta bookMeta) {
+        if (meta instanceof BookMeta) {
+            BookMeta bookMeta = (BookMeta) meta;
             return bookMeta.getPages();
         }
         return null;

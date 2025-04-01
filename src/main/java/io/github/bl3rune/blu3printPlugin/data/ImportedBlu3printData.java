@@ -8,13 +8,11 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
+import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 
 public class ImportedBlu3printData extends Blu3printData {
-
-    private Integer maxScale;
 
     public ImportedBlu3printData(Player player, String encodedString) {
         this.encoded = encodedString;
@@ -32,6 +30,14 @@ public class ImportedBlu3printData extends Blu3printData {
         int zSize = Integer.parseInt(coords[2]);
         this.ingredientsCount = new HashMap<>();
 
+        Integer maxSize = Blu3printConfiguration.getMaxSize();
+        if (player != null && maxSize != null && (xSize > maxSize || ySize > maxSize || zSize > maxSize)) {
+            if (!player.hasPermission("blu3print.no-size-limit")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                return;
+            }
+        }
+
         Orientation orientation = Orientation.SOUTH;
         Rotation rotation = Rotation.TOP;
         int scale = 1;
@@ -45,17 +51,18 @@ public class ImportedBlu3printData extends Blu3printData {
             // Well you tried
         }
 
-        if (maxScale == null) {
-            try {
-                maxScale = Integer.parseInt(Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString("blu3print.max-scale"));
-            } catch (Exception e) {
-                maxScale = null;
-            }
-        }
-
+        Integer maxScale = Blu3printConfiguration.getMaxScale();
         if (player != null && maxScale != null && scale > maxScale) {
             if (!player.hasPermission("blu3print.no-scale-limit")) {
                 player.sendMessage(ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
+                return;
+            }
+        }
+
+        Integer maxOverallSize = Blu3printConfiguration.getMaxOverallSize();
+        if (player != null && maxOverallSize != null && ((xSize * scale) > maxOverallSize || (ySize * scale) > maxOverallSize || (zSize * scale) > maxOverallSize)) {
+            if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
                 return;
             }
         }

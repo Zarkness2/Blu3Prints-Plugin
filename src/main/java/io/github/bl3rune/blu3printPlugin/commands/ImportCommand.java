@@ -45,7 +45,6 @@ public class ImportCommand implements CommandExecutor {
                 sender.sendMessage("You must be holding a blank blu3print to import a blu3print.");
                 return false;
             }
-            player.getInventory().remove(blankBlu3print);
             String uuid = instance.getKeyFromEncoding(args[1]);
             if (uuid == null) {
                 uuid = UUID.randomUUID().toString();

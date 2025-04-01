@@ -1,9 +1,11 @@
 package io.github.bl3rune.blu3printPlugin.enums;
 
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 
 import io.github.bl3rune.blu3printPlugin.commands.Blu3printCommand;
 import io.github.bl3rune.blu3printPlugin.commands.FaceCommand;
+import io.github.bl3rune.blu3printPlugin.commands.FaceTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.ScaleCommand;
 import io.github.bl3rune.blu3printPlugin.commands.DuplicateCommand;
 import io.github.bl3rune.blu3printPlugin.commands.ExportCommand;
@@ -12,6 +14,7 @@ import io.github.bl3rune.blu3printPlugin.commands.HelpCommand;
 import io.github.bl3rune.blu3printPlugin.commands.ImportCommand;
 import io.github.bl3rune.blu3printPlugin.commands.NameCommand;
 import io.github.bl3rune.blu3printPlugin.commands.RotateCommand;
+import io.github.bl3rune.blu3printPlugin.commands.RotateTabCompleter;
 
 /**
  * Enum for the different command types.
@@ -20,8 +23,8 @@ public enum CommandType {
 
     BLU3PRINT("blu3print", new Blu3printCommand()),
     DUPLICATE("duplicate", new DuplicateCommand()),
-    FACE("face", new FaceCommand()),
-    ROTATE("rotate", new RotateCommand()),
+    FACE("face", new FaceCommand(), new FaceTabCompleter()),
+    ROTATE("rotate", new RotateCommand(), new RotateTabCompleter()),
     IMPORT("import", new ImportCommand()),
     EXPORT("export", new ExportCommand()),
     SCALE("scale", new ScaleCommand()),
@@ -32,10 +35,18 @@ public enum CommandType {
 
     private final String commandString;
     private final CommandExecutor commandExecutor;
+    private final TabCompleter tabCompleter;
 
     CommandType(String commandString, CommandExecutor commandExecutor) {
         this.commandString = commandString;
         this.commandExecutor = commandExecutor;
+        this.tabCompleter = null;
+    }
+
+    CommandType(String commandString, CommandExecutor commandExecutor, TabCompleter tabCompleter) {
+        this.commandString = commandString;
+        this.commandExecutor = commandExecutor;
+        this.tabCompleter = tabCompleter;
     }
 
     @Override
@@ -45,6 +56,10 @@ public enum CommandType {
 
     public CommandExecutor getCommandExecutor() {
         return commandExecutor;
+    }
+
+    public TabCompleter getTabCompleter() {
+        return tabCompleter;
     }
 
     /**

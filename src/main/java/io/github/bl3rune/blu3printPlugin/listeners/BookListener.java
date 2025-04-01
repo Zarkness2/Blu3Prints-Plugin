@@ -72,6 +72,7 @@ public class BookListener implements Listener {
             String pos2 = extractLocation(itemMeta,  "location2-" + playerUuid);
             finishedBook = Blu3printItem.getFinishedBlu3print(uuid, player, bookMeta.getTitle(), false);
             blu3printData = new CapturedBlu3printData(player, pos1, pos2);
+            if (blu3printData.getPosition() == null) return;
         }
         instance.saveOrUpdateCachedBlu3print(uuid, blu3printData);
         finishedBook.setAmount(1);

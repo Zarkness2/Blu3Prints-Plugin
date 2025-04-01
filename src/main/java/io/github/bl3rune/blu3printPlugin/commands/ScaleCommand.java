@@ -38,7 +38,11 @@ public class ScaleCommand implements CommandExecutor {
                 try {
                     scale = Integer.parseInt(args[0]);
                 } catch(Exception e) {
-                    sender.sendMessage("Invalid scale argument: Must be an integer");
+                    sender.sendMessage("Invalid scale argument: Must be an integer at least 1");
+                    return true;
+                }
+                if (scale < 1) {
+                    sender.sendMessage("Invalid scale argument: Must be an integer at least 1");
                     return true;
                 }
             }

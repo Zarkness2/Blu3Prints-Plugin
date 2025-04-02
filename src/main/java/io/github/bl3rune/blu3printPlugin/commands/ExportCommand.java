@@ -13,6 +13,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.utils.InventoryUtils;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class ExportCommand implements CommandExecutor {
 
@@ -35,7 +40,10 @@ public class ExportCommand implements CommandExecutor {
 
             sender.sendMessage(ChatColor.BLUE + lore.get(0));
             Blu3printData data = Blu3PrintPlugin.getBlu3PrintPlugin().getBlu3printFrpmCache(lore.get(1));
-            sender.sendMessage(ChatColor.GRAY + data.getEncodedString());
+            BaseComponent component = new TextComponent(ChatColor.GRAY + data.getEncodedString());
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to copy to clipboard")));
+            component.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, data.getEncodedString()));
+            sender.spigot().sendMessage(component);
             
         }
         return true;

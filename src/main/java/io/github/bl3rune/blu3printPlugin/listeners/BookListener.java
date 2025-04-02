@@ -57,12 +57,13 @@ public class BookListener implements Listener {
             for (String page : pages) {
                 builder.append(page);
             }
-            String cacheKey = instance.getKeyFromEncoding(builder.toString());
+            String encodedString = builder.toString().replaceAll("\\s+", "");
+            String cacheKey = instance.getKeyFromEncoding(encodedString);
             if (cacheKey != null) {
                 uuid = cacheKey;
             }
             finishedBook = Blu3printItem.getFinishedBlu3print(uuid, player, bookMeta.getTitle(), true);
-            blu3printData = new ImportedBlu3printData(player, builder.toString());
+            blu3printData = new ImportedBlu3printData(player, encodedString);
             if (blu3printData.getPosition() == null) return;
             bookMeta.setPages(new ArrayList<>());
             book.setItemMeta(bookMeta);

@@ -107,6 +107,7 @@ Configuration can be found in the `config.yml` file.
 - `blu3print.max-overall-size` - Maximum size of any one side of a blu3print times the scale (default 200 blocks)
 - `blu3print.cooldown` - Minimum time in milliseconds between using Blu3print items / writer
 - `blu3print.recipe.ingredients` - Customisable list of ingredients used in crafting the blu3print writer
+- `blu3print.ignored-materials` - Customisable list of materials to ignore when building / placing blu3prints
 
 
 License

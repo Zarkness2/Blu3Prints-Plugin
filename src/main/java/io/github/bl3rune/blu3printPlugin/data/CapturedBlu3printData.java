@@ -25,6 +25,10 @@ public class CapturedBlu3printData extends Blu3printData {
 
     public CapturedBlu3printData(Player player, String pos1, String pos2) {
 
+        if (materialIgnoreList.isEmpty()) {
+            materialIgnoreList = Blu3printConfiguration.getIgnoredMaterials();
+        }
+
         Location loc1 = LocationUtils.getCoordsFromPosString(pos1);
         Location loc2 = LocationUtils.getCoordsFromPosString(pos2);
 

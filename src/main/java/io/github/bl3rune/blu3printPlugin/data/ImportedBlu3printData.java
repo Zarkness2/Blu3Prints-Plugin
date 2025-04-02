@@ -15,6 +15,11 @@ import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 public class ImportedBlu3printData extends Blu3printData {
 
     public ImportedBlu3printData(Player player, String encodedString) {
+
+        if (materialIgnoreList.isEmpty()) {
+            materialIgnoreList = Blu3printConfiguration.getIgnoredMaterials();
+        }
+
         this.encoded = encodedString;
         String header = encodedString.split(Pattern.quote(HEADER_END))[0]; // encodedString >> HEADER + BODY
         String[] splitHeader = header.split(Pattern.quote(COLUMN_END)); // HEADER >> INGREDIENTS MAP + DIMENSIONS + PERSPECTIVE (OPTIONAL)

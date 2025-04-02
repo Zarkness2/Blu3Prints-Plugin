@@ -5,8 +5,13 @@
 
 **Allows players to copy/paste/export/import blocks using blu3prints and using blocks in inventory** (or for free if in creative mode)
 
+Basic Usage tutorial
+--------
 [![Watch the video](https://img.youtube.com/vi/iNgYVwC9tRA/maxresdefault.jpg)](https://www.youtube.com/watch?v=iNgYVwC9tRA)
 
+Advanced Usage tutorial
+--------
+[![Watch the advance video](https://img.youtube.com/vi/Cub94f1ckE8/maxresdefault.jpg)](https://www.youtube.com/watch?v=Cub94f1ckE8)
 
 Features
 --------

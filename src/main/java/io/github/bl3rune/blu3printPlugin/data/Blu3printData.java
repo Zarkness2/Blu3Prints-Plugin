@@ -1,5 +1,6 @@
 package io.github.bl3rune.blu3printPlugin.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +46,7 @@ public abstract class Blu3printData {
             "y", "z"
     );
 
-    public static final List<String> materialIgnoreList = List.of(
-            Material.END_PORTAL.name(),
-            Material.NETHER_PORTAL.name()
-    );
+    protected static List<String> materialIgnoreList = new ArrayList<>();
 
     protected MaterialData[][][] selectionGrid;       // [z] [y] [x]
     protected Map<String, Integer> ingredientsCount;  // key: material, value: count

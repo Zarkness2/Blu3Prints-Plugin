@@ -8,3 +8,8 @@ blu3print:
       - PAPER
       - LAPIS_LAZULI
       - FEATHER
+  ignored-materials: # Materials to ignore when building / placing blu3prints
+    - AIR
+    - WATER
+    - LAVA
+    - GRASS

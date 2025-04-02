@@ -57,8 +57,10 @@ public class HelpCommand implements CommandExecutor {
     private void writerHelp(Player player) {
         player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "##### Blu3Print Writer Help #####");
         player.sendMessage(ChatColor.WHITE + "While holding a Blu3print Writer, you can interact by:");
-        player.sendMessage(ChatColor.GRAY + "Using left click on a block to set the first position of the selection area");
-        player.sendMessage(ChatColor.GRAY + "Using right click on a block to set the second position of the selection area");
+        player.sendMessage(ChatColor.GRAY + "Using left click on a block to set the first position of the selection area (this clears the ignore list if there is one)");
+        player.sendMessage(ChatColor.GRAY + "Using left click (while sneaking) on a block to ignore/unignore the block within a selection");
+        player.sendMessage(ChatColor.GRAY + "Using right click on a block to set the second position of the selection area (this clears the ignore list if there is one)");
+        player.sendMessage(ChatColor.GRAY + "Using right click (while sneaking) on a block to show the ignore block list within the current selection");
         player.sendMessage(ChatColor.GRAY + "Using right click on the air to set open the blu3print writer");
         player.sendMessage(ChatColor.WHITE + "With the blu3print writer open:");
         player.sendMessage(ChatColor.GRAY + "Click on sign and give the blu3print a name to complete it");
@@ -69,7 +71,7 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "##### Blu3Print Usage Help #####");
         player.sendMessage(ChatColor.WHITE + "While holding a completed Blu3print, you can interact by:");
         player.sendMessage(ChatColor.GRAY + "Using left click on a block to build the blu3print from that block");
-        player.sendMessage(ChatColor.GRAY + "Using left click (while holding shift) on a block to build the blu3print from that block even if there are blocks in the way");
+        player.sendMessage(ChatColor.GRAY + "Using left click (while sneaking) on a block to build the blu3print from that block even if there are blocks in the way");
         player.sendMessage(ChatColor.GRAY + "Using right click to explain the blu3print");
     }
 

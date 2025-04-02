@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
+import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 
@@ -34,7 +35,6 @@ public abstract class Blu3printData {
     public static final String DOUBLE_CHARACTER = ".";
     public static final String MAPS_TO = "=";
     public static final String MODIFIER = ":";
-    private static Integer maxScale;
 
     public static final List<String> BLU3_ENCODE = List.of(
             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
@@ -326,17 +326,22 @@ public abstract class Blu3printData {
     }
 
     public String updateScale(Player player, int newScale)  {
-        if (maxScale == null) {
-            try {
-                maxScale = Integer.parseInt(Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString("blu3print.max-scale"));
-            } catch (Exception e) {
-                maxScale = null;
-            }
-        }
-
+        Integer maxScale = Blu3printConfiguration.getMaxScale();
         if (player != null && maxScale != null && newScale > maxScale) {
             if (!player.hasPermission("blu3print.no-scale-limit")) {
                 player.sendMessage(ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
+                return "";
+            }
+        }
+
+        Integer maxOverallSize = Blu3printConfiguration.getMaxOverallSize();
+        if (player != null && maxOverallSize != null && (
+                (position.getXSize() * newScale) > maxOverallSize || 
+                (position.getYSize() * newScale) > maxOverallSize || 
+                (position.getZSize() * newScale) > maxOverallSize
+            )) {
+            if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
                 return "";
             }
         }

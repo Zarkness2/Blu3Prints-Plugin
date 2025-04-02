@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,17 +15,29 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 
+import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
+import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
 import io.github.bl3rune.blu3printPlugin.utils.LocationUtils;
 
 public class CapturedBlu3printData extends Blu3printData {
 
     public CapturedBlu3printData(Player player, String pos1, String pos2) {
-        String world = pos1.split(Pattern.quote(MODIFIER))[0];
 
         Location loc1 = LocationUtils.getCoordsFromPosString(pos1);
         Location loc2 = LocationUtils.getCoordsFromPosString(pos2);
+
+        String world = loc1.getWorld().getName();
+        if (!world.equals(loc2.getWorld().getName())) {
+            player.sendMessage(ChatColor.RED + "I didn't think I would have to say this...");
+            player.sendMessage(ChatColor.RED + "...");
+            player.sendMessage(ChatColor.RED + "But the two locations have to be in the same world...");
+            player.sendMessage(ChatColor.RED + "...");
+            player.sendMessage(ChatColor.RED + "...");
+            player.sendMessage(ChatColor.RED + "Take a break for a bit friend.");
+            return;
+        }
 
         int[] locX = LocationUtils.reorderNegativeCoords(loc1.getBlockX(), loc2.getBlockX());
         int[] locY = LocationUtils.reorderNegativeCoords(loc1.getBlockY(), loc2.getBlockY());
@@ -34,6 +46,16 @@ public class CapturedBlu3printData extends Blu3printData {
         int xSize = locX[1] - locX[0] + 1;
         int ySize = locY[1] - locY[0] + 1;
         int zSize = locZ[1] - locZ[0] + 1;
+
+        Integer maxSize = Blu3printConfiguration.getMaxSize();
+        if (player != null && maxSize != null && (xSize > maxSize || ySize > maxSize || zSize > maxSize)) {
+            if (!player.hasPermission("blu3print.no-size-limit")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                return;
+            }
+        }
+
+        List<String> ignoreBlocks = PlayerInteractListener.getIgnoreList(player);
 
         selectionGrid = new MaterialData[zSize][ySize][xSize];
         this.ingredientsCount = new HashMap<>();
@@ -44,7 +66,9 @@ public class CapturedBlu3printData extends Blu3printData {
             for (int y = 0; y < ySize; y++) {
                 for (int x = 0; x < xSize; x++) {
                     Block block = Bukkit.getWorld(world).getBlockAt(locX[0] + x, locY[0] + y, locZ[0] + z);
-                    if (isBlockIgnorable(block)) {
+                    if (isBlockIgnorable(block) || ignoreBlocks.stream().anyMatch(
+                                i -> LocationUtils.locationsMatch(LocationUtils.getCoordsFromPosString(i), block.getLocation())
+                            )) {
                         selectionGrid[z][y][x] = new MaterialData(null, Material.AIR, null, 1);
                     } else {
                         BlockFace face = null;

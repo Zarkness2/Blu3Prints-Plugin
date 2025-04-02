@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.gson.Gson;
 
+import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
@@ -35,14 +36,9 @@ import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
 public final class Blu3PrintPlugin extends JavaPlugin {
 
     private static Blu3PrintPlugin instance;
-    private static int [] bukkitVersion = new int[3];
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
-    }
-
-    public static int[] getBukkitVersion() {
-        return bukkitVersion;
     }
     
     private HashMap<String, Blu3printData> cachedBlueprints = new HashMap<>();
@@ -51,19 +47,11 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        try {
-            String [] version = Bukkit.getBukkitVersion().split("-")[0].split(".");
-            bukkitVersion[0] = Integer.parseInt(version[0]);
-            bukkitVersion[1] = Integer.parseInt(version[1]);
-            bukkitVersion[2] = Integer.parseInt(version[2]);
-        } catch (Exception e) {
-            // Do nothing
-        }
-
         getLogger().info("Starting Blu3Print Plugin");
         instance = this;
         getConfig().options().copyDefaults();
         saveDefaultConfig();
+        Blu3printConfiguration.refreshConfiguration();
         addBlu3printRecipes();
 
         loadSavedBlueprintsToCache();
@@ -74,6 +62,9 @@ public final class Blu3PrintPlugin extends JavaPlugin {
 
         for (CommandType commandType : CommandType.values()) {
             getCommand(commandType.getFullCommandName()).setExecutor(commandType.getCommandExecutor());
+            if (commandType.getTabCompleter() != null) {
+                getCommand(commandType.getFullCommandName()).setTabCompleter(commandType.getTabCompleter());
+            }
         }
 
     }

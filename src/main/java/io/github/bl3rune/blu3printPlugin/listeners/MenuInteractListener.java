@@ -21,7 +21,9 @@ public class MenuInteractListener implements Listener {
 
             Player player = (Player) event.getWhoClicked();
             String itemName = event.getCurrentItem().getItemMeta().getDisplayName();
-            switch (MenuItems.getMenuItem(itemName)) {
+            MenuItems menuItem = MenuItems.getMenuItem(itemName);
+            if (menuItem == null) return;
+            switch (menuItem) {
                 case DUPLICATE:
                     player.performCommand(CommandType.DUPLICATE.getFullCommandName());
                     break;

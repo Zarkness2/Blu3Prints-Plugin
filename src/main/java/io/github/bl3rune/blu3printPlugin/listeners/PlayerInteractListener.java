@@ -1,8 +1,10 @@
 package io.github.bl3rune.blu3printPlugin.listeners;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,6 +22,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
+import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
 import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
@@ -28,8 +31,12 @@ public class PlayerInteractListener implements Listener {
 
     private static final List<Material> IGNORE_BLOCKS = List.of(Material.LECTERN);
     private static Map<String, Long> lastInteractionPerPlayer = new HashMap<>();
-    private static Long cooldown;
+    private static Map<String, List<String>> blockIgnoreListPerPlayer = new HashMap<>();
     private Blu3PrintPlugin instance;
+
+    public static List<String> getIgnoreList(Player player) {
+        return blockIgnoreListPerPlayer.getOrDefault(player.getUniqueId().toString(), new ArrayList<>());
+    }
 
     public PlayerInteractListener () {
         instance = Blu3PrintPlugin.getBlu3PrintPlugin();
@@ -53,17 +60,11 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        if (cooldown == null) {
-            try {
-                cooldown = Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getLong("blu3print.cooldown");
-            } catch (Exception e) {
-                cooldown = Long.valueOf(-1);
-            }
-        }
-
+        Integer cooldown = Blu3printConfiguration.getCooldown();
         String playerKey = player.getUniqueId().toString();
         long currentTime = System.currentTimeMillis();
         if (lastInteractionPerPlayer.getOrDefault(playerKey, currentTime - cooldown) + cooldown > currentTime) {
+            event.setCancelled(true);
             return; // Whoa, Slow Down Maurice!
         }
         lastInteractionPerPlayer.put(playerKey, currentTime);
@@ -91,11 +92,10 @@ public class PlayerInteractListener implements Listener {
                 secondBlockSelected(player, block, item);
             }
         } else if (Blu3printItem.isBlu3print(item, false)) {
+            event.setCancelled(true);
             if (isLeftClickBlockEvent(action)) {
-                event.setCancelled(true);
                 placeBlu3print(player, block, item);
             } else if (isRightClickBlockEvent(action)) {
-                event.setCancelled(true);
                 explainBlu3print(player, item);
             }
         }
@@ -114,18 +114,49 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void firstBlockSelected(Player player, Block block, ItemStack item) {
+        String playerUUID = player.getUniqueId().toString();
         Location location = block.getLocation();
-        player.sendMessage("First block selected " + locationStringFormat(location));
-        item = persistDataKey(item, "location1-" + player.getUniqueId().toString(), locationStringFormat(location));
+        String locationString = locationStringFormat(location);
+        if (player.isSneaking()) {
+            List<String> ignoreList = blockIgnoreListPerPlayer.getOrDefault(playerUUID, new ArrayList<>());
+            if (ignoreList.stream().anyMatch(l -> l.equals(locationString))) {
+                player.sendMessage(ChatColor.RED + "Block already ignored, removing from ignore list");
+                ignoreList = ignoreList.stream().filter(l -> !l.equals(locationString)).collect(Collectors.toList());
+            } else {
+                player.sendMessage(ChatColor.GREEN + "Adding block to ignore list");
+                ignoreList.add(locationString);
+            }
+            blockIgnoreListPerPlayer.put(playerUUID, ignoreList);
+            return;
+        }
+        player.sendMessage("First block selected " + locationString);
+        if (blockIgnoreListPerPlayer.containsKey(playerUUID)) {
+            player.sendMessage(ChatColor.GRAY + "Cleared block ignore list");
+            blockIgnoreListPerPlayer.remove(playerUUID);
+        }
+        item = persistDataKey(item, "location1-" + playerUUID, locationString);
     }
 
     private void secondBlockSelected(Player player, Block block, ItemStack item) {
+        String playerUUID = player.getUniqueId().toString();
         if (player.isSneaking()) {
-            return; // allow them to read the book
+            List<String> ignoreList = blockIgnoreListPerPlayer.getOrDefault(playerUUID, new ArrayList<>());
+            if (ignoreList.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "No blocks on ignore list");
+            } else {
+                player.sendMessage("Blocks on ignore list");
+                ignoreList.forEach(i -> player.sendMessage(ChatColor.GRAY + " - " + i));
+            }
+            player.closeInventory();
+            return;
         }
         player.closeInventory();
         Location location = block.getLocation();
         player.sendMessage("Second block selected " + locationStringFormat(location));
+        if (blockIgnoreListPerPlayer.containsKey(playerUUID)) {
+            player.sendMessage(ChatColor.GRAY + "Cleared block ignore list");
+            blockIgnoreListPerPlayer.remove(playerUUID);
+        }
         item = persistDataKey(item, "location2-" + player.getUniqueId().toString(), locationStringFormat(location));
     }
 

@@ -28,4 +28,12 @@ public class LocationUtils {
         }
     }
 
+    public static boolean locationsMatch(Location location1, Location location2) {
+        if (!location1.getWorld().getName().equals(location2.getWorld().getName())) return false;
+        if (location1.getBlockX() != location2.getBlockX()) return false;
+        if (location1.getBlockY() != location2.getBlockY()) return false;
+        if (location1.getBlockZ() != location2.getBlockZ()) return false;
+        return true;
+    }
+
 }

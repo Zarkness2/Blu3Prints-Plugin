@@ -1,5 +1,7 @@
 blu3print:
-  max-scale: 8 # Maximum scale of a Blu3Print
+  max-scale: 10 # Maximum scale of a Blu3Print
+  max-size: 100 # Maximum size of a Blu3Print
+  max-overall-size: 200 # Maximum size * scale of a Blu3Print
   cooldown: 500 # Cooldown in ms between two Blu3print usages
   recipe: # Recipe for crafting a Blu3Print
     ingredients:

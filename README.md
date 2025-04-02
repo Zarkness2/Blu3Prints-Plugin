@@ -3,7 +3,10 @@
 [![Latest Release](https://img.shields.io/github/v/release/bl3rune/Blu3Prints-Plugin)](https://github.com/bl3rune/Blu3Prints-Plugin/releases)
 [![Build Status](https://github.com/bl3rune/Blu3Prints-Plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/bl3rune/Blu3Prints-Plugin/actions)
 
+![Banner!](/images/Banner.png "Banner")
+
 **Allows players to copy/paste/export/import blocks using blu3prints and using blocks in inventory** (or for free if in creative mode)
+![usage!](/images/Blu3print.gif "Usage")
 
 Basic Usage tutorial
 --------

@@ -97,24 +97,26 @@ public abstract class Blu3printData {
     // PLACING BLU3PRINT SECTION
 
     public void placeBlocks(Player player, Location location)  {
-        Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false);
+        Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(location);
+
+        Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false, blocksUnableToPlace);
         if (!missingBlocks.isEmpty()) {
             player.sendMessage(ChatColor.RED + "Missing these blocks to place the blu3print:");
             missingBlocks.forEach((k, v)  -> player.sendMessage(ChatColor.RED + " - " + k + ": " + v));
             return;
         }
 
-        if (!checkSpaceIsClear(location)) {
+        if (!blocksUnableToPlace.isEmpty()) {
             if (player.isSneaking()) {
-                player.sendMessage(ChatColor.AQUA + "Placing blu3print despite blocks in the way.");
+                player.sendMessage(ChatColor.AQUA + "Forcing placing blu3print despite blocks in the way.");
             } else {
                 player.sendMessage(ChatColor.RED + "You can't place the blu3print here. There are blocks in the way.");
-                player.sendMessage(ChatColor.RED + "To place the blu3print, sneak while using the blu3print.");
+                player.sendMessage(ChatColor.RED + "To force placement of the blu3print, sneak while using the blu3print.");
                 return;
             }
         }
 
-        checkPlayerHasBLocksInInventory(player, true);
+        checkPlayerHasBLocksInInventory(player, true, blocksUnableToPlace);
         
         position.resetLoops();
         int [] coords = position.next(true);
@@ -165,13 +167,26 @@ public abstract class Blu3printData {
         return true;
     }
     
-    private Map<String, Integer> checkPlayerHasBLocksInInventory(Player player, boolean removeBlocks) {
-        if (player.getGameMode() == GameMode.CREATIVE) {
-            logger().info("Player is in creative mode, skipping inventory check");
+    private Map<String, Integer> checkPlayerHasBLocksInInventory(Player player, boolean removeBlocks, Map<String,Integer> blocksUnableToPlace) {
+        if (player.getGameMode() == GameMode.CREATIVE || player.hasPermission("blu3print.no-block-cost")) {
+            if (removeBlocks) {
+                player.sendMessage(ChatColor.GREEN + "Placing Blu3print for free!");
+            }
             return new HashMap<>();
         }
 
         Map<String, Integer> ingCountCopy = new HashMap<>(ingredientsCount);
+        if (player.isSneaking() && player.hasPermission("blu3print.force-place-discount")) { // Discount blocks unable to place
+            blocksUnableToPlace.forEach((material, amount) -> {
+                Integer count = ingCountCopy.getOrDefault(material, 0);
+                count = count - amount;
+                if (count < 1) {
+                    ingCountCopy.remove(material);
+                } else {
+                    ingCountCopy.put(material, amount);
+                }
+            });
+        }
         Map<Integer, ItemStack> inventoryBlocks = new HashMap<>();
         Map<Integer, ItemStack> storageBlocks = new HashMap<>();
         int inventoryIndex = 0;
@@ -277,7 +292,7 @@ public abstract class Blu3printData {
         return ingCountCopy;
     }
 
-    private boolean checkSpaceIsClear(Location location)  {
+    private Map<String, Integer> checkSpaceIsClear(Location location)  {
         World world = Bukkit.getWorld(location.getWorld().getName());
         int x = location.getBlockX();
         int y = location.getBlockY() + 1;
@@ -285,6 +300,7 @@ public abstract class Blu3printData {
         int scale = position.getScale();
         position.resetLoops();
         int [] coords = position.next(true);
+        Map<String, Integer> blocksUnableToPlace = new HashMap<>();
         while (coords != null) {
             MaterialData materialData = this.selectionGrid[coords[0]/scale][coords[1]/scale][coords[2]/scale];
             if  (materialData  == null || materialData.getName() ==  null) {
@@ -293,12 +309,13 @@ public abstract class Blu3printData {
             }
             Block block = world.getBlockAt(x + coords[2], y + coords[1], z + coords[0]);
             if  (block !=  null && !isBlockIgnorable(block))  {
-                return false;
+                Integer count = blocksUnableToPlace.getOrDefault(materialData.getName(), 0);
+                blocksUnableToPlace.put(materialData.getName(), count + 1);
             }
             coords = position.next(true);
          
         }
-        return true;
+        return blocksUnableToPlace;
     }
 
     // EDITING BLU3PRINT SECTION

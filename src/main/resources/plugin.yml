@@ -5,7 +5,7 @@ api-version: '1.18'
 prefix: Blu3PrintPlugin
 authors: [ bl3rune ]
 description: Blu3PrintPlugin
-website: https://github.com/bl3rune
+website: https://github.com/bl3rune/Blu3Prints-Plugin
 commands:
   blu3print:
     description: Blu3PrintPlugin usage
@@ -68,7 +68,7 @@ commands:
     aliases: [ blu3.help ]
 permissions:
   blu3print.*:
-    description: Allowed to use all Blu3PrintPlugin commands
+    description: Allowed to use all Blu3PrintPlugin commands with no restrictions or costs
     children:
       blu3print: true
       blu3print.duplicate: true
@@ -79,6 +79,8 @@ permissions:
       blu3print.scale: true
       blu3print.no-size-limit: true
       blu3print.no-scale-limit: true
+      blu3print.force-place-discount: true
+      blu3print.no-block-cost: true
       blu3print.name: true
       blu3print.give: true
       blu3print.help: true
@@ -113,6 +115,12 @@ permissions:
     description: No restrictions on size of Blu3prints
   blu3print.no-scale-limit:
     description: No restrictions on scaling of Blu3prints
+  blu3print.force-place-discount:
+    default: false
+    description: Force placing Blu3prints no longer costs blocks unable to place
+  blu3print.no-block-cost:
+    default: false
+    description: Removes block cost for placing Blu3prints in survival
   blu3print.name:
     description: Allowed to set the name of the Blu3Print currently held
   blu3print.give:

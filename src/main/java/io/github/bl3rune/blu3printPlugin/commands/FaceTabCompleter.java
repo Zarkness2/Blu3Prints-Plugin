@@ -2,6 +2,7 @@ package io.github.bl3rune.blu3printPlugin.commands;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,7 +15,7 @@ public class FaceTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList(Orientation.values()).stream().map(Orientation::toString).toList();
+            return Arrays.asList(Orientation.values()).stream().map(Orientation::toString).collect(Collectors.toList());
         }
         return null;
     }

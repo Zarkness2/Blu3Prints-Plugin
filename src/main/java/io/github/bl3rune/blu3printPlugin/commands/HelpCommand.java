@@ -91,6 +91,7 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.export") + " to export the blu3print to chat");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.rotate") + " or " + wrapCommand("/blu3print <rotation>") + " to rotate the blu3print");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.face") + " or " + wrapCommand("/blu3print.face <side>") + " to change the side of the blu3print facing you");
+        player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.turn <turn>") + " to turn the side of the blu3print facing you");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.duplicate") + " to duplicate the blu3print");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.scale") + " to change the scale of the blu3print");
         player.sendMessage(ChatColor.WHITE + "While holding a Blu3print Writer:");

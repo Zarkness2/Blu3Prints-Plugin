@@ -3,10 +3,6 @@ package io.github.bl3rune.blu3printPlugin.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import static io.github.bl3rune.blu3printPlugin.data.Blu3printData.MODIFIER;
-
-import java.util.regex.Pattern;
-
 public class LocationUtils {
 
     /**
@@ -16,7 +12,7 @@ public class LocationUtils {
      * @return org.bukkit.Location
      */
     public static Location getCoordsFromPosString(String positionString) {
-        String[] pos = positionString.split(Pattern.quote(MODIFIER));
+        String[] pos = EncodingUtils.modifierSplit(positionString);
         return new Location(Bukkit.getWorld(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]), Integer.parseInt(pos[3]));
     }
 

@@ -56,7 +56,7 @@ public class PlayerInteractListener implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         // Exit if item is not a Blu3print
-        if (!Blu3printItem.isBlu3print(item)) {
+        if (!Blu3printItem.isBlu3print(item, null)) {
             return;
         }
 

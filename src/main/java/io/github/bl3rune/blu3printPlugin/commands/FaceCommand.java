@@ -1,13 +1,18 @@
 package io.github.bl3rune.blu3printPlugin.commands;
 
 import java.util.Arrays;
+import java.util.UUID;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
+import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
 import io.github.bl3rune.blu3printPlugin.utils.InventoryUtils;
@@ -30,15 +35,27 @@ public class FaceCommand implements CommandExecutor {
             }
             Orientation orientation = data.getPosition().getOrientation().getNextOrientation();
             if (args.length > 0) {
-                orientation = Orientation.valueOf(args[0]);
-                if  (orientation == null)  {
-                    sender.sendMessage("Invalid orientation argument, try one of the following: " + Arrays.toString(Orientation.values()));
+                try {
+                    orientation = Orientation.valueOf(args[0]);
+                } catch (Exception e) {
+                    sender.sendMessage("Invalid orientation argument, try one of the following: "
+                            + Arrays.toString(Orientation.values()));
                     return true;
                 }
             }
-            String newKey = data.updateOrientation(orientation);
-            Blu3printItem.updateLore(Arrays.asList("updated by " + player.getDisplayName(), newKey), item);
-            player.getInventory().setItemInMainHand(item);
+            String newEncoding = data.updateEncodingWithOrientation(orientation);
+            if (newEncoding == null) {
+                sender.sendMessage("Failed to update orientation");
+                return true;
+            }
+            String key = Blu3PrintPlugin.getBlu3PrintPlugin().getKeyFromEncoding(newEncoding);
+            if (key == null) {
+                key = UUID.randomUUID().toString();
+                Blu3PrintPlugin.getBlu3PrintPlugin().saveOrUpdateCachedBlu3print(key, new ImportedBlu3printData(player, newEncoding));
+            }
+            ItemMeta meta = item.getItemMeta();
+            Blu3printItem newItem = Blu3printItem.getFinishedBlu3print(key, "modified by " + player.getDisplayName(), meta.getDisplayName(), false);
+            player.getInventory().setItemInMainHand(newItem);
         }
         return true;
     }

@@ -37,9 +37,16 @@ public enum Orientation {
         return description;
     }
 
-    public Orientation getOppositeFace()   {
+    public Orientation getOpposite()   {
         BlockFace blockFace = getCartesianBlockFace(this.getBlockFace());
         return getOrientation(blockFace.getOppositeFace());
+    }
+
+    public boolean isCompass() {
+        if (this == UP || this == DOWN) {
+            return false;
+        }
+        return true;
     }
 
     public Orientation getNextOrientation() {

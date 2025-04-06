@@ -2,7 +2,6 @@ package io.github.bl3rune.blu3printPlugin.data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -10,7 +9,11 @@ import org.bukkit.entity.Player;
 
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
-import io.github.bl3rune.blu3printPlugin.enums.Rotation;
+import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
+
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.ROW_END;
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.COLUMN_END;
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.DOUBLE_CHARACTER;
 
 public class ImportedBlu3printData extends Blu3printData {
 
@@ -21,62 +24,51 @@ public class ImportedBlu3printData extends Blu3printData {
         }
 
         this.encoded = encodedString;
-        String header = encodedString.split(Pattern.quote(HEADER_END))[0]; // encodedString >> HEADER + BODY
-        String[] splitHeader = header.split(Pattern.quote(COLUMN_END)); // HEADER >> INGREDIENTS MAP + DIMENSIONS + PERSPECTIVE (OPTIONAL)
-        this.ingredientsMap = new HashMap<>();
-        for (String ingredientFormula : splitHeader[0].split(Pattern.quote(ROW_END))) {
-            String[] formulaSplit = ingredientFormula.split(Pattern.quote(MAPS_TO));
-            ingredientsMap.put(formulaSplit[1], formulaSplit[0]);
+        String header = EncodingUtils.getHeaderFromEncoding(encodedString);
+        this.ingredientsMap = EncodingUtils.getIngredientsMapFromHeader(header);
+        if (this.ingredientsMap.isEmpty()) {
+            sendMessage(player,"Invalid Blu3print data provided! @ingredients");
+            return;
         }
         
-        String [] coords = splitHeader[1].split(Pattern.quote(MODIFIER));
-        int xSize = Integer.parseInt(coords[0]);
-        int ySize = Integer.parseInt(coords[1]);
-        int zSize = Integer.parseInt(coords[2]);
+        int [] sizes = EncodingUtils.getSizesFromHeader(header);
+        if (sizes.length < 3) {
+            sendMessage(player,"Invalid Blu3print data provided! @sizes");
+            return;
+        }
         this.ingredientsCount = new HashMap<>();
 
         Integer maxSize = Blu3printConfiguration.getMaxSize();
-        if (player != null && maxSize != null && (xSize > maxSize || ySize > maxSize || zSize > maxSize)) {
+        if (player != null && maxSize != null && sizesExceedLimit(sizes, 1, maxSize)) {
             if (!player.hasPermission("blu3print.no-size-limit")) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
                 return;
             }
         }
 
-        Orientation orientation = Orientation.SOUTH;
-        Rotation rotation = Rotation.TOP;
-        int scale = 1;
-        try {
-            String[] splitPerspective = splitHeader[2].split(Pattern.quote(ROW_END));
-            orientation = Orientation.getOrientation(splitPerspective[0]);
-            rotation = Rotation.fromCode(splitPerspective[1]);
-            scale = Integer.parseInt(splitPerspective[2]);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Well you tried
-        }
+        ManipulatablePosition dData = EncodingUtils.getDirectionalDataFromHeader(header);
 
         Integer maxScale = Blu3printConfiguration.getMaxScale();
-        if (player != null && maxScale != null && scale > maxScale) {
+        if (player != null && maxScale != null && dData.getScale() > maxScale) {
             if (!player.hasPermission("blu3print.no-scale-limit")) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
+                sendMessage(player,ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
                 return;
             }
         }
 
         Integer maxOverallSize = Blu3printConfiguration.getMaxOverallSize();
-        if (player != null && maxOverallSize != null && ((xSize * scale) > maxOverallSize || (ySize * scale) > maxOverallSize || (zSize * scale) > maxOverallSize)) {
+        if (player != null && maxOverallSize != null && sizesExceedLimit(sizes, dData.getScale(), maxOverallSize)) {
             if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
+                sendMessage(player,ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
                 return;
             }
         }
 
-        this.position = new ManipulatablePosition(zSize, ySize, xSize, orientation, rotation, scale);
+        this.position = new ManipulatablePosition(sizes[2], sizes[1], sizes[0], dData.getOrientation(), dData.getRotation(), dData.getScale());
 
-        buildSelectionGrid(encodedString.split(Pattern.quote(HEADER_END))[1]);
-        if (scale > 1) {
-            final int scaleFinal = scale;
+        buildSelectionGrid(EncodingUtils.getBodyFromEncoding(encodedString));
+        if (dData.getScale() > 1) {
+            final int scaleFinal = dData.getScale();
             Map<String, Integer> newCount = new HashMap<>();
             this.ingredientsCount.forEach((k,v) -> newCount.put(k, v  * scaleFinal));
             this.ingredientsCount = newCount;
@@ -95,7 +87,7 @@ public class ImportedBlu3printData extends Blu3printData {
                 prev = s;
             } else if (prev.startsWith(DOUBLE_CHARACTER) && prev.length() < 3) { 
                 prev = prev + s;
-            } else if (BLU3_ENCODE.contains(s) || s.equals(DOUBLE_CHARACTER)) {
+            } else if (EncodingUtils.isEncoded(s) || s.equals(DOUBLE_CHARACTER)) {
                 addToSelection(position, prev);
                 prev = s;
             } else { // A NUMBER
@@ -107,7 +99,7 @@ public class ImportedBlu3printData extends Blu3printData {
     private void addToSelection(ManipulatablePosition position, String encoded) {
         MaterialData materialData = decodeBlock(encoded);
         for (int i = 0; i < materialData.getCount(); i++)  {
-            int[] coords =  position.next();
+            int[] coords =  position.next(false);
             this.selectionGrid[coords[0]][coords[1]][coords[2]] = materialData;
         }
         if (materialData.getName() != null) {
@@ -120,7 +112,7 @@ public class ImportedBlu3printData extends Blu3printData {
         MaterialData materialData = decodeBlock(encoded);
         int added = 0;
         while(added == 0 || !position.endOfInnerLoop()) {
-            int[] coords =  position.next();
+            int[] coords =  position.next(false);
             this.selectionGrid[coords[0]][coords[1]][coords[2]] = materialData;
             added++;
         }
@@ -158,9 +150,9 @@ public class ImportedBlu3printData extends Blu3printData {
         BlockFace face = null;
         Material material = null;
 
-        if (decoded.contains(MODIFIER)) {
-            String[] split = decoded.split(Pattern.quote(MODIFIER));
-            Orientation orientation = Orientation.valueOf(split[0]);
+        String[] split = EncodingUtils.modifierSplit(decoded);
+        if (split.length > 1) {
+            Orientation orientation = Orientation.getOrientation(split[0]);
             face = orientation.getBlockFace();
             material = Material.getMaterial(split[1]);
         } else {

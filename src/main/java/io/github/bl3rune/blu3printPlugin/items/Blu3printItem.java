@@ -8,10 +8,10 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 
 public class Blu3printItem extends ItemStack {
 
@@ -28,10 +28,11 @@ public class Blu3printItem extends ItemStack {
         return blu3print;
     }
 
-    public static Blu3printItem getFinishedBlu3print(String uuid, Player player, String name, boolean isImported) {
-        List<String> lore = Arrays.asList((isImported ? "imported" : "made") + " by " + player.getDisplayName(), uuid);
+    public static Blu3printItem getFinishedBlu3print(String uuid, String author, String name, boolean isImported) {
+        List<String> lore = Arrays.asList(author, uuid);
         Blu3printItem blu3print = new Blu3printItem(LOCKED_MATERIAL);
         ItemMeta meta = blu3print.getItemMeta();
+        name = name.startsWith(BLU3PRINT_PREFIX) ? EncodingUtils.modifierSplit(name)[1].trim() : name;
         meta.setDisplayName(BLU3PRINT_PREFIX + " : " + name);
         meta.setLore(lore);
         blu3print.setItemMeta(meta);
@@ -58,26 +59,6 @@ public class Blu3printItem extends ItemStack {
         }
         return key;
      
-    }
-
-    public static ItemStack updateLore(List<String> lore, ItemStack item)  {
-        ItemMeta meta = item.getItemMeta();
-        meta.setLore(lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    public static List<String> getPages(ItemStack blu3Print) {
-        ItemMeta meta = blu3Print.getItemMeta();
-        if (meta instanceof BookMeta) {
-            BookMeta bookMeta = (BookMeta) meta;
-            return bookMeta.getPages();
-        }
-        return null;
-    }
-
-    public static boolean isBlu3print(ItemStack item) {
-        return isBlu3print(item, null);
     }
 
     /**

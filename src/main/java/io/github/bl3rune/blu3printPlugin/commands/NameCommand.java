@@ -1,6 +1,5 @@
 package io.github.bl3rune.blu3printPlugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +26,7 @@ public class NameCommand implements CommandExecutor {
                 return false;
             }
             StringBuilder sb = new StringBuilder();
-            sb.append(Blu3printItem.BLU3PRINT_PREFIX);
+            sb.append(Blu3printItem.BLU3PRINT_PREFIX + " :");
             for (String arg : args) {
                 sb.append(" ");
                 sb.append(arg);
@@ -36,7 +35,7 @@ public class NameCommand implements CommandExecutor {
             itemMeta.setDisplayName(sb.toString());
             blu3print.setItemMeta(itemMeta);
             player.getInventory().setItemInMainHand(blu3print);
-            player.sendMessage(ChatColor.BLUE + "Blu3print name changed to: " + sb.toString());
+            player.sendMessage( "Blu3print name changed to: " + sb.toString());
         }
         return true;
     }

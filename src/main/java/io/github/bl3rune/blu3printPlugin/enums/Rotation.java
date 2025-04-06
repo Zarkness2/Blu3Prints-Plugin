@@ -4,59 +4,49 @@ import java.util.stream.Stream;
 
 public enum Rotation {
 
-    TOP("0"),   // 0°
-    RIGHT("1"), // 90°
-    BOTTOM("2"),// 180°
-    LEFT("3");  // 270°
+    TOP(0), // 0°
+    RIGHT(1), // 90°
+    BOTTOM(2), // 180°
+    LEFT(3); // 270°
 
-    private final String code;
+    private final int index;
 
-    Rotation(String code) {
-        this.code = code;
+    Rotation(int i) {
+        this.index = i;
+    }
+
+    public static Rotation getRotation(int index) {
+        int rem = index % 4;
+        switch (rem) {
+            default: return TOP;
+            case 1: return RIGHT;
+            case 2: return BOTTOM;
+            case 3: return LEFT;
+        }
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public String getCode() {
-        return code;
+        return Integer.toString(index);
     }
 
-    public boolean isVertical()  {
-        return this == TOP || this == BOTTOM;
+    public boolean isHorizontal() {
+        return index % 2 > 0;
     }
 
-    public boolean isHorizontal()  {
-        return this == LEFT || this == RIGHT;
-    }
-
-    public Rotation getOpposite()  {
-        switch (this) {
-            case BOTTOM:
-                return TOP;
-            case LEFT:
-                return RIGHT;
-            case RIGHT:
-                return LEFT;
-            case TOP:
-            default:
-                return BOTTOM;
-        }
+    public Rotation getOpposite() {
+        return getRotation(index + 2);
     }
 
     public Rotation getNextRotation() {
-        switch (this) {
-            case BOTTOM:
-                return Rotation.LEFT;
-            case LEFT:
-                return Rotation.TOP;
-            case RIGHT:
-                return Rotation.BOTTOM;
-            case TOP:
-            default:
-                return Rotation.RIGHT;
-        }
+        return getRotation(index + 1);
     }
 
     public static Rotation fromCode(String code) {
         return Stream.of(Rotation.values()).filter(r -> r.getCode().equals(code))
-            .findFirst().orElse(Rotation.TOP);
+                .findFirst().orElse(Rotation.TOP);
     }
 }

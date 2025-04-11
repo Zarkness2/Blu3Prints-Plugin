@@ -1,39 +1,51 @@
 package io.github.bl3rune.blu3printPlugin.data;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
+import io.github.bl3rune.blu3printPlugin.enums.AttachedFace;
+import io.github.bl3rune.blu3printPlugin.enums.Axis;
+import io.github.bl3rune.blu3printPlugin.enums.Half;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
+import io.github.bl3rune.blu3printPlugin.enums.RailShape;
+import io.github.bl3rune.blu3printPlugin.enums.SlabType;
 
-import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.MODIFIER;
+import java.util.Set;
 
-public class MaterialData {
+public abstract class MaterialData {
 
-    private String name;
-    private Material material;
-    private BlockFace face;
-    private int count;
+    protected String namespace = null;
+    protected String name; // (optional) encodedComplexData : (optional) nsKey : materialName
+    protected Material material;
+    protected String complexData; // [ key=value, key=value, ... ]
+    protected String encodedComplexData; // k=v,k=v,...
+    protected Orientation face = null;
+    protected Orientation rotation = null;
+    protected Axis axis = null;
+    protected Set<Orientation> multiFaces = null;
+    protected AttachedFace attachedFace = null;
+    protected Half half = null;
+    protected SlabType slabType = null;
+    protected RailShape railShape = null;
+    protected int count;
 
-    public MaterialData(Block block) {
-        this.material = block.getType();
-        this.count = 1;
-        this.name = material.name();
-        BlockData blockData = block.getBlockData();
-        if (blockData instanceof Directional) {
-            Directional directional = (Directional) blockData;
-            Orientation orientation = Orientation.getOrientation(directional.getFacing());
-            this.face = orientation.getBlockFace();
-            this.name = orientation.getDescription() + MODIFIER + this.name;
+    protected String removeDefaultValue(String raw, String key) {
+        if (raw.contains("," + key)) {
+            return raw.replace("," + key, "");
         }
+        if (raw.contains(key + ",")) {
+            return raw.replace(key + ",", "");
+        }
+        return raw.replace(key, "");
     }
 
-    public MaterialData(String name, Material material, BlockFace face, int count) {
-        this.name = name;
-        this.material = material;
-        this.face = face;
-        this.count = count;
+    protected String addKey(String raw, String key) {
+        if (raw.isEmpty()) {
+            return key;
+        }
+        return raw + "," + key;
+    }
+
+    public String getNamespace() {
+        return namespace;
     }
 
     public String getName() {
@@ -44,7 +56,7 @@ public class MaterialData {
         return material;
     }
 
-    public BlockFace getFace()  {
+    public Orientation getFace()  {
         return face;
     }
 
@@ -52,20 +64,40 @@ public class MaterialData {
         return count;
     }
 
-    public void setName(String name)  {
-        this.name = name;
+    public String getComplexData() {
+        return complexData;
     }
 
-    public void setMaterial(Material material)  {
-        this.material = material;
+    public String getEncodedComplexData() {
+        return encodedComplexData;
     }
 
-    public void setFace(BlockFace face)  {
-        this.face = face;
+    public Orientation getRotation() {
+        return rotation;
     }
 
-    public void setCount(int count)   {
-        this.count = count;
+    public Axis getAxis() {
+        return axis;
+    }
+
+    public Set<Orientation> getMultiFaces() {
+        return multiFaces;
+    }
+
+    public AttachedFace getAttachedFace() {
+        return attachedFace;
+    }
+
+    public Half getHalf() {
+        return half;
+    }
+
+    public SlabType getSlabType() {
+        return slabType;
+    }
+
+    public RailShape getRailShape() {
+        return railShape;
     }
 
 }

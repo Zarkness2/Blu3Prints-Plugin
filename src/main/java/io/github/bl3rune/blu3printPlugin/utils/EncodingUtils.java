@@ -27,7 +27,7 @@ public class EncodingUtils {
             "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
             "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
             "y", "z"
-        };
+    };
 
     // ENCODED STRING = HEADER + HEADER_END + BODY
     public static String getHeaderFromEncoding(String encoding) {
@@ -88,7 +88,7 @@ public class EncodingUtils {
         for (String s : split(split[0], ROW_END)) {
             String [] ingredientSplit = split(s, MAPS_TO);
             if (ingredientSplit.length > 1) {
-                map.put(ingredientSplit[1], ingredientSplit[0]);
+                map.put(s.substring(ingredientSplit[0].length() + 1), ingredientSplit[0]);
             }
         }
         return map;

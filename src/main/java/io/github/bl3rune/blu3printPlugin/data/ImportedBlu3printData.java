@@ -4,16 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
-import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 
 import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.ROW_END;
 import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.COLUMN_END;
 import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.DOUBLE_CHARACTER;
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.MODIFIER;
 
 public class ImportedBlu3printData extends Blu3printData {
 
@@ -127,7 +126,7 @@ public class ImportedBlu3printData extends Blu3printData {
         int count;
 
         if (encoded == null) {
-            return new MaterialData(null, Material.AIR, null, 1);
+            return new ImportedMaterialData(null, Material.AIR, null, 1);
         }
 
         if (encoded.startsWith(DOUBLE_CHARACTER)) {
@@ -144,21 +143,24 @@ public class ImportedBlu3printData extends Blu3printData {
                     .orElse(null);
 
         if (decoded == null) {
-            return new MaterialData(null, Material.AIR, null, count);
+            return new ImportedMaterialData(null, Material.AIR, null, count);
         }
 
-        BlockFace face = null;
+        String encodedComplexData = null;
         Material material = null;
 
         String[] split = EncodingUtils.modifierSplit(decoded);
         if (split.length > 1) {
-            Orientation orientation = Orientation.getOrientation(split[0]);
-            face = orientation.getBlockFace();
-            material = Material.getMaterial(split[1]);
+            if (!split[0].contains("=")) {
+                material = Material.matchMaterial(decoded.toLowerCase());
+            } else {
+                material = Material.matchMaterial(decoded.substring(decoded.indexOf(MODIFIER) + 1));
+                encodedComplexData = split[0];
+            }
         } else {
-            material = Material.getMaterial(decoded);
+            material = Material.matchMaterial(decoded);
         }
-        return new MaterialData(decoded, material, face, count);
+        return new ImportedMaterialData(decoded, material, encodedComplexData, count);
     }
 
 }

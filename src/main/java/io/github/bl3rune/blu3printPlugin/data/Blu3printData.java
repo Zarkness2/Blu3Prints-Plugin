@@ -13,7 +13,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -87,7 +86,7 @@ public abstract class Blu3printData {
         Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false, blocksUnableToPlace);
         if (!missingBlocks.isEmpty()) {
             sendMessage(player, ChatColor.RED + "Missing these blocks to place the blu3print:");
-            missingBlocks.forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k + ": " + v));
+            missingBlocks.forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k + " : " + v));
             return;
         }
 
@@ -96,7 +95,7 @@ public abstract class Blu3printData {
                 sendMessage(player, ChatColor.AQUA + "Forcing placing blu3print despite blocks in the way.");
             } else {
                 sendMessage(player, ChatColor.RED + "You can't place the blu3print here. There are blocks in the way.");
-                sendMessage(player, 
+                sendMessage(player,
                         ChatColor.RED + "To force placement of the blu3print, sneak while using the blu3print.");
                 return;
             }
@@ -135,23 +134,19 @@ public abstract class Blu3printData {
 
         World world = Bukkit.getWorld(location.getWorld().getName());
         if (world == null) {
-
             logger().info("World not found: " + location.getWorld().getName());
             return false;
         }
 
         world.setType(location, materialData.getMaterial());
-        if (materialData.getFace() != null) {
-            BlockData blockData = world.getBlockData(location);
-            if (blockData != null && blockData instanceof Directional) {
-                Directional directional = (Directional) blockData;
-                try {
-                    System.out.println(directional.getAsString());
-                    directional.setFacing(materialData.getFace());
-                    world.setBlockData(location, directional);
-                } catch (Exception e) {
-                    // Tried to rotate to stupid direction
-                }
+        String complexData = materialData.getComplexData();
+        if (complexData != null) {
+            try {
+                BlockData blockData = Bukkit.createBlockData(complexData);
+                world.setBlockData(location, blockData);
+            } catch (Exception e) { 
+                /* Tried to apply invalid block data */
+                e.printStackTrace();
             }
         }
         return true;
@@ -315,12 +310,12 @@ public abstract class Blu3printData {
 
     public String updateEncodingWithTurn(Turn turn) {
         int s = position.getScale();
-        Pair<Orientation,Rotation> turned = position.calculateTurn(turn);
-        int [] newSizes = position.getNewSizes(turned.getA());
+        Pair<Orientation, Rotation> turned = position.calculateTurn(turn);
+        int[] newSizes = position.getNewSizes(turned.getA());
         newSizes = position.getNewSizes(turned.getB(), newSizes);
         updateDirectionalEncodings(turned.getA(), turned.getB());
         return updateManipulatablePosition(
-            new ManipulatablePosition(newSizes[0], newSizes[1], newSizes[2], turned.getA(), turned.getB(), s));
+                new ManipulatablePosition(newSizes[0], newSizes[1], newSizes[2], turned.getA(), turned.getB(), s));
     }
 
     public String updateEncodingWithOrientation(Orientation newOrientation) {
@@ -373,14 +368,15 @@ public abstract class Blu3printData {
     }
 
     private void updateDirectionalEncodings(Orientation o, Rotation r) {
-        Map<String, String> ingredientsMapCopy = new HashMap<>(ingredientsMap);
+        // Map<String, String> ingredientsMapCopy = new HashMap<>(ingredientsMap);
         // DO NOTHING FOR NOW
         // this.ingredientsMap = ingredientsMapCopy;
     }
 
     private String updateManipulatablePosition(ManipulatablePosition newPosition) {
         String bodyString = EncodingUtils.getBodyFromEncoding(encoded);
-        String newHeader = EncodingUtils.buildHeaderWithPerspective(EncodingUtils.ingredientsMapToString(ingredientsMap), newPosition);
+        String newHeader = EncodingUtils
+                .buildHeaderWithPerspective(EncodingUtils.ingredientsMapToString(ingredientsMap), newPosition);
         String newEncoding = EncodingUtils.buildEncodedString(newHeader, bodyString);
         System.out.println("Updated blu3print: " + newEncoding);
         return newEncoding;

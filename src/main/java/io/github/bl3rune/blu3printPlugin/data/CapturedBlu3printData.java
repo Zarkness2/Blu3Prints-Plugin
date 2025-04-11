@@ -76,11 +76,11 @@ public class CapturedBlu3printData extends Blu3printData {
                     if (isBlockIgnorable(block) || ignoreBlocks.stream().anyMatch(
                                 i -> LocationUtils.locationsMatch(LocationUtils.getCoordsFromPosString(i), block.getLocation())
                             )) {
-                        selectionGrid[z][y][x] = new MaterialData(null, Material.AIR, null, 1);
+                        selectionGrid[z][y][x] = new ImportedMaterialData(null, Material.AIR, null, 1);
                     } else {
                         String blockName = block.getType().name();
                         ingredientsCount.put(block.getType().name(), ingredientsCount.getOrDefault(block.getType().name(), 0) + 1);
-                        MaterialData materialData = new MaterialData(block);
+                        MaterialData materialData = new CapturedMaterialData(block);
                         ingredientsCountWithDirection.put(materialData.getName(), ingredientsCount.getOrDefault(blockName, 0) + 1);
                         selectionGrid[z][y][x] = materialData;
                     }
@@ -117,7 +117,7 @@ public class CapturedBlu3printData extends Blu3printData {
         while(coords !=  null) {
             MaterialData materialData = selectionGrid[coords[0]][coords[1]][coords[2]];
             if (materialData == null) {
-                materialData = new MaterialData(null, Material.AIR, null, 1);
+                materialData = new ImportedMaterialData(null, Material.AIR, null, 1);
             }
             String name = materialData.getName();
             sb.append(determineEncoding(previous, name, count));

@@ -1,15 +1,16 @@
 package io.github.bl3rune.blu3printPlugin.data;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import io.github.bl3rune.blu3printPlugin.enums.Direction;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
+import io.github.bl3rune.blu3printPlugin.enums.Turn;
+import io.github.bl3rune.blu3printPlugin.utils.Pair;
 
 public class ManipulatablePosition {
 
@@ -19,55 +20,23 @@ public class ManipulatablePosition {
     private Orientation orientation;
     private Rotation rotation;
     private int scale;
-    private transient String storedEncoding;
 
+    // Temporary fields for iterations
     private Iterator<Integer> outerLoop;
     private Iterator<Integer> middleLoop;
     private Iterator<Integer> innerLoop;
     private int outerIndex;
     private int middleIndex;
     private int innerIndex;
-    private Dimension[] ordering;
+    private Direction[] ordering;
+    private boolean usingScaling;
 
-    private static enum Dimension {
-        X_PLUS(3), X_MINUS(-3), Y_PLUS(2), Y_MINUS(-2), Z_PLUS(1), Z_MINUS(-1);
-
-        private final int index;
-
-        private Dimension(int index) {
-            this.index = index;
-        }
-
-        public int getPosIndex() {
-            return index < 0 ? (index * -1) - 1 : index - 1;
-        }
-
-        public static Dimension getInverted(Dimension d) {
-            switch (d) {
-                case X_PLUS:
-                    return X_MINUS;
-                case X_MINUS:
-                    return X_PLUS;
-                case Y_PLUS:
-                    return Y_MINUS;
-                case Y_MINUS:
-                    return Y_PLUS;
-                case Z_PLUS:
-                    return Z_MINUS;
-                case Z_MINUS:
-                    return Z_PLUS;
-                default:
-                    return null;
-            }
-        }
+    public ManipulatablePosition(ManipulatablePosition p, int scale) {
+        this(p.getZSize(), p.getYSize(), p.getXSize(), p.getOrientation(), p.getRotation(), scale);
     }
 
     public ManipulatablePosition(int z, int y, int x, Orientation o, Rotation r) {
         this(z, y, x, o, r, 1);
-    }
-
-    public ManipulatablePosition(ManipulatablePosition p, int scale) {
-        this(p.getZSize(), p.getYSize(), p.getXSize(), p.getOrientation(), p.getRotation(), scale);
     }
 
     public ManipulatablePosition(int z, int y, int x, Orientation o, Rotation r, int scale) {
@@ -108,67 +77,147 @@ public class ManipulatablePosition {
         return scale * scale * scale;
     }
 
-    public int doubledScale() {
-        return scale * 2;
-    }
-
-    public String getEncoding() {
-        return storedEncoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.storedEncoding = encoding;
-    }
-
     // CONVERSION METHODS
 
-    public MaterialData[][][] reorientSelectionGrid(MaterialData[][][] oldGrid, Orientation o, Rotation r) {
-        Dimension[] newOrdering = calculateOrdering(o, r);
-        Function<Integer[], Integer[]> converter = buildConversionFunction(newOrdering);
-        Integer[] sizes = converter.apply(new Integer[] { zMax, yMax, xMax });
-
-        MaterialData[][][] newGrid = new MaterialData[sizes[0]][sizes[1]][sizes[2]];
-
-        for (int z = 0; z < zMax; z++) {
-            for (int y = 0; y < yMax; y++) {
-                for (int x = 0; x < xMax; x++) {
-                    MaterialData data = oldGrid[z][y][x];
-                    Integer[] converted = converter.apply(new Integer[] { z, y, x, 0 });
-                    newGrid[converted[0]][converted[1]][converted[2]] = data;
-                }
-            }
-        }
-        return newGrid;
+    public int[] getNewSizes(Rotation newRotation) {
+        return getNewSizes(newRotation, new int[] { zMax, yMax, xMax });
     }
 
-    private Function<Integer[], Integer[]> buildConversionFunction(Dimension[] newOrdering) {
-        Dimension dimz = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 0).findFirst().get();
-        Dimension dimy = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 1).findFirst().get();
-        Dimension dimx = Arrays.stream(this.ordering).filter(d -> d.getPosIndex() == 2).findFirst().get();
+    public int[] getNewSizes(Rotation newRotation, int[] sizes) {
+        if (newRotation == rotation || newRotation == rotation.getOpposite()) {
+            return sizes;
+        }
+        int outer = sizes[ordering[0].getPosIndex()];
+        int middle = sizes[ordering[1].getPosIndex()];
+        int inner = sizes[ordering[2].getPosIndex()];
+        return unscramble(outer, inner, middle);
+    }
 
-        int[] reordered = new int[3];
-
-        for (int i = 0; i < 3; i++) {
-            reordered[ordering[i].getPosIndex()] = newOrdering[i].getPosIndex();
+    public int[] getNewSizes(Orientation newOrientation) {
+        int[] newSizes = new int[3];
+        if (newOrientation == orientation || newOrientation == orientation.getOpposite()) {
+            return new int[] { zMax, yMax, xMax };
+        }
+        switch (orientation) {
+            default:
+            case NORTH:
+            case SOUTH:
+            case EAST:
+            case WEST:
+                if (newOrientation == Orientation.UP || newOrientation == Orientation.DOWN) {
+                    newSizes[0] = yMax;
+                    if (newOrientation == Orientation.EAST || newOrientation == Orientation.WEST) {
+                        newSizes[1] = xMax;
+                        newSizes[2] = zMax;
+                    } else {
+                        newSizes[1] = zMax;
+                        newSizes[2] = xMax;
+                    }
+                } else {
+                    newSizes[0] = xMax;
+                    newSizes[1] = yMax;
+                    newSizes[2] = zMax;
+                }
+                break;
+            case UP:
+            case DOWN:
+                newSizes[1] = zMax;
+                if (newOrientation == Orientation.EAST || newOrientation == Orientation.WEST) {
+                    newSizes[0] = xMax;
+                    newSizes[2] = yMax;
+                } else {
+                    newSizes[0] = yMax;
+                    newSizes[2] = xMax;
+                }
+                break;
         }
 
-        boolean flippedZ = Arrays.stream(newOrdering).noneMatch(o -> dimz == o);
-        boolean flippedY = Arrays.stream(newOrdering).noneMatch(o -> dimy == o);
-        boolean flippedX = Arrays.stream(newOrdering).noneMatch(o -> dimx == o);
+        return newSizes;
+    }
 
-        return (coords) -> { // as [z][y][x] for sizes [z][y][x][0] for coordinates
-            Integer[] signedCoords = new Integer[3];
-            boolean allowNegative = coords.length > 3;
+    public Pair<Orientation, Rotation> calculateTurn(Turn turn) {
+        switch (orientation) {
+            default:
+            case NORTH:
+                return calculatePossibleNewOrientations(new Orientation[] { // UP, RIGHT, DOWN, LEFT
+                        Orientation.DOWN,
+                        Orientation.EAST,
+                        Orientation.UP,
+                        Orientation.WEST
+                }, turn);
+            case SOUTH:
+                return calculatePossibleNewOrientations(new Orientation[] {
+                        Orientation.DOWN,
+                        Orientation.WEST,
+                        Orientation.UP,
+                        Orientation.EAST
+                }, turn);
+            case EAST:
+                return calculatePossibleNewOrientations(new Orientation[] {
+                        Orientation.DOWN,
+                        Orientation.SOUTH,
+                        Orientation.UP,
+                        Orientation.NORTH
+                }, turn);
+            case WEST:
+                return calculatePossibleNewOrientations(new Orientation[] {
+                        Orientation.DOWN,
+                        Orientation.NORTH,
+                        Orientation.UP,
+                        Orientation.SOUTH
+                }, turn);
+            case UP:
+                return calculatePossibleNewOrientations(new Orientation[] {
+                        Orientation.NORTH,
+                        Orientation.EAST,
+                        Orientation.SOUTH,
+                        Orientation.WEST
+                }, turn);
+            case DOWN:
+                return calculatePossibleNewOrientations(new Orientation[] {
+                        Orientation.NORTH,
+                        Orientation.WEST,
+                        Orientation.SOUTH,
+                        Orientation.EAST
+                }, turn);
+        }
+    }
 
-            signedCoords[0] = (allowNegative && flippedZ) ? zMax - coords[0] - 1 : coords[0];
-            signedCoords[1] = (allowNegative && flippedY) ? yMax - coords[1] - 1 : coords[1];
-            signedCoords[2] = (allowNegative && flippedX) ? xMax - coords[2] - 1 : coords[2];
-            return new Integer[] {
-                    signedCoords[reordered[0]],
-                    signedCoords[reordered[1]],
-                    signedCoords[reordered[2]]
-            }; // as new arrangement
-        };
+    /**
+     * 
+     * @param newOrientations New Orientations when turning from UP, RIGHT, DOWN,
+     *                        LEFT in the TOP rotaiton for each side
+     * @param turn            Which direction to turn
+     * @return
+     */
+    private Pair<Orientation, Rotation> calculatePossibleNewOrientations(Orientation[] newOrientations, Turn turn) {
+        turn = turn.plusRotation(rotation);
+        Orientation o = newOrientations[turn.getIndex()];
+        Rotation r = null;
+
+        if (o.isCompass() && orientation.isCompass()) {
+            r = rotation;
+        } else {
+            Orientation other = o.isCompass() ? o : orientation;
+            boolean isUp = o == Orientation.UP || orientation == Orientation.UP;
+            boolean turningUp = o == Orientation.UP || orientation == Orientation.DOWN;
+            switch (other) {
+                default: // NORTH
+                    r = isUp ? rotation : rotation.getOpposite();
+                    break;
+                case EAST:
+                    r = turningUp ? rotation.getNextRotation() : Rotation.getRotation(rotation.getIndex() + 3);
+                    break;
+                case SOUTH:
+                    r = isUp ? rotation.getOpposite() : rotation;
+                    break;
+                case WEST:
+                    r = turningUp ? Rotation.getRotation(rotation.getIndex() + 3) : rotation.getNextRotation();
+                    break;
+            }
+        }
+
+        return new Pair<>(o, r);
     }
 
     // ITERATION METHODS
@@ -181,25 +230,17 @@ public class ManipulatablePosition {
         return innerLoop != null && !innerLoop.hasNext();
     }
 
-    public void resetLoops() {
-        outerLoop = null;
-        middleLoop = null;
-        innerLoop = null;
-
-    }
-
-    public int[] next() {
-        return next(false);
-    }
-
     /**
-     * Gets the next position in the 3D sequence.
+     * Gets the next position in the 3D sequence based on the iterators
+     * - outerLoop
+     * - middleLoop
+     * - innerLoop
      * 
      * @return the next position in the 3D sequence.
      */
-    public int[] next(boolean scaled) {
-        if (outerLoop == null) {
-            resetLoops(scaled);
+    public int[] next(boolean scaling) {
+        if (outerLoop == null || usingScaling != scaling) {
+            resetLoops(scaling);
         }
 
         if (!innerLoop.hasNext()) {
@@ -209,115 +250,140 @@ public class ManipulatablePosition {
                     return null;
                 }
                 outerIndex = outerLoop.next();
-                middleLoop = getMiddleLoop(scaled);
+                middleLoop = getLoop(ordering[1], (scaling ? scale : 1));
             }
             middleIndex = middleLoop.next();
-            innerLoop = getInnerLoop(scaled);
+            innerLoop = getLoop(ordering[2], (scaling ? scale : 1));
         }
         innerIndex = innerLoop.next();
         return unscramble(outerIndex, middleIndex, innerIndex);
     }
 
     /**
-     * Calculates the Dimensions in order of manipulation base on
+     * Calculates the Directions in order of [outer,middle,inner] for loops for
+     * given orientation and rotation.
      * 
-     * @param o 3D orientation the camera is facing towards
-     * @param r 3D rotation the camera is facing towards
-     * 
-     *          POSITION = 1st(positive or negative) 2nd+/- 3rd+/-
-     *          * * * * ROTATION TOP * * * * *
-     *          WEST = X- Z- Y+ EAST = X+ Z+ Y+
-     *          DOWN = Y- X+ Z- UP = Y+ X- Z+
-     *          NORTH = Z- X+ Y+ SOUTH = Z+ X- Y+
-     *          * * * * ROTATION RIGHT * * * * *
-     *          WEST = X- Y- Z- EAST = X+ Y- Z+
-     *          DOWN = Y- Z+ X+ UP = Y+ Z- X-
-     *          NORTH = Z- Y- X+ SOUTH = Z+ Y- X-
-     *          * * * * ROTATION BOTTOM * * * * *
-     *          WEST = X- Z+ Y- EAST = X+ Z- Y-
-     *          DOWN = Y- X- Z+ UP = Y+ X+ Z-
-     *          NORTH = Z- X- Y- SOUTH = Z+ X+ Y-
-     *          * * * * ROTATION LEFT * * * * *
-     *          WEST = X- Y+ Z+ EAST = X+ Y+ Z-
-     *          DOWN = Y- Z- X- UP = Y+ Z+ X+
-     *          NORTH = Z- Y+ X- SOUTH = Z+ Y+ X+
+     * @param orientation Orientation front of design is facing towards
+     * @param rotation    3D rotation the camera is facing towards
+     *                    POSITION = (outer loop) (middle loop) (inner loop)
+     *                    NORTH = Z- Y+ X- SOUTH = Z+ X- Y+
+     *                    EAST = X- Z+ Y+ WEST = X+ Z- Y+
+     *                    UP = Y- X- Z+ DOWN = Y+ X+ Z-
+     * @return the directions to iterate over in [outer,middle,inner] order
      */
-    private Dimension[] calculateOrdering(Orientation o, Rotation r) {
-        Dimension[] order = new Dimension[3];
-        switch (o) {
-            case WEST:
-                return innerOrdering(Dimension.X_MINUS, Dimension.Y_PLUS, Dimension.Z_MINUS, r, order);
-            case EAST:
-                return innerOrdering(Dimension.X_PLUS, Dimension.Y_PLUS, Dimension.Z_PLUS, r, order);
-            case DOWN:
-                return innerOrdering(Dimension.Y_MINUS, Dimension.Z_MINUS, Dimension.X_MINUS, r, order);
-            case UP:
-                return innerOrdering(Dimension.Y_PLUS, Dimension.Z_MINUS, Dimension.X_PLUS, r, order);
+    private Direction[] calculateOrdering(Orientation orientation, Rotation rotation) {
+        boolean positive = true;
+        Direction inner, middle = Direction.Y_POS, outer;
+        switch (orientation) {
             case NORTH:
-            default:
-                return innerOrdering(Dimension.Z_MINUS, Dimension.Y_PLUS, Dimension.X_MINUS, r, order);
+                positive = false;
             case SOUTH:
-                return innerOrdering(Dimension.Z_PLUS, Dimension.Y_PLUS, Dimension.X_PLUS, r, order);
+            default:
+                outer = positive ? Direction.Z_POS : Direction.Z_NEG;
+                inner = positive ? Direction.X_POS : Direction.X_NEG;
+                break;
+            case EAST:
+                positive = false;
+            case WEST:
+                outer = positive ? Direction.X_POS : Direction.X_NEG;
+                inner = positive ? Direction.Z_POS : Direction.Z_NEG;
+                break;
+            case UP:
+                positive = false;
+            case DOWN:
+                outer = positive ? Direction.Y_POS : Direction.Y_NEG;
+                middle = Direction.Z_POS;
+                inner = positive ? Direction.X_POS : Direction.X_NEG;
+                break;
         }
+        return calculateRotation(outer, middle, inner, rotation);
     }
 
-    private Dimension[] innerOrdering(Dimension outer, Dimension middle, Dimension inner, Rotation r,
-            Dimension[] order) {
-        boolean isLeft = Rotation.LEFT == r;
-        boolean isTop = Rotation.TOP == r;
-        order[2] = outer;
-        if (r.isHorizontal()) {
-            order[1] = isLeft ? middle : Dimension.getInverted(middle);
-            order[0] = isLeft ? inner : Dimension.getInverted(inner);
-        } else {
-            order[1] = isTop ? inner : Dimension.getInverted(inner);
-            order[0] = isTop ? middle : Dimension.getInverted(middle);
+    /**
+     * Applies roatation to the directions based on these rules:
+     * - ROTATION TOP = (outer) (middle) (inner)
+     * - ROTATION RIGHT = (outer) -(inner) (middle)
+     * - ROTATION BOTTOM = (outer) -(middle) -(inner)
+     * - ROTATION LEFT = (outer) (inner) -(middle)
+     * 
+     * @param outer    Direction for the outer loop in top roation
+     * @param middle   Direction for the middle loop in top roation
+     * @param inner    Direction for the inners loop in top roation
+     * @param rotation Rotation to apply
+     * @return the newly ordered directions to iterate over in [outer,middle,inner]
+     *         order
+     */
+    private Direction[] calculateRotation(Direction outer, Direction middle, Direction inner, Rotation rotation) {
+        Direction[] order = new Direction[3];
+        order[0] = outer;
+        switch (rotation) {
+            case TOP:
+            default:
+                order[1] = middle;
+                order[2] = inner;
+                break;
+            case RIGHT:
+                order[2] = middle;
+                order[1] = inner.getInverted();
+                break;
+            case BOTTOM:
+                order[1] = middle.getInverted();
+                order[2] = inner.getInverted();
+                break;
+            case LEFT:
+                order[2] = middle.getInverted();
+                order[1] = inner;
+                break;
         }
         return order;
     }
 
-    private void resetLoops(boolean scaled) {
-        outerLoop = getOuterLoop(scaled);
-        middleLoop = getMiddleLoop(scaled);
-        innerLoop = getInnerLoop(scaled);
+    /**
+     * Resets all iterators back to the beginning
+     * 
+     * @param scaling should loops be scaled by `this.scale`
+     */
+    private void resetLoops(boolean scaling) {
+        usingScaling = scaling;
+        outerLoop = getLoop(ordering[0], (scaling ? scale : 1));
+        middleLoop = getLoop(ordering[1], (scaling ? scale : 1));
+        innerLoop = getLoop(ordering[2], (scaling ? scale : 1));
         outerIndex = outerLoop.next();
         middleIndex = middleLoop.next();
     }
 
-    private Iterator<Integer> getOuterLoop(boolean scaled) {
-        return getLoop(ordering[2], scaled);
-    }
-
-    private Iterator<Integer> getMiddleLoop(boolean scaled) {
-        return getLoop(ordering[1], scaled);
-    }
-
-    private Iterator<Integer> getInnerLoop(boolean scaled) {
-        return getLoop(ordering[0], scaled);
-    }
-
-    private Iterator<Integer> getLoop(Dimension dimension, boolean scaled) {
-
-        switch (dimension) {
-            case X_PLUS:
-            case X_MINUS:
-                return generateList((scaled ? xMax * scale : xMax), dimension == Dimension.X_MINUS).iterator();
-            case Y_PLUS:
-            case Y_MINUS:
-                return generateList((scaled ? yMax * scale : yMax), dimension == Dimension.Y_MINUS).iterator();
-            case Z_PLUS:
-            case Z_MINUS:
+    /**
+     * Builds an iterator of integers based on the size of direction and the scaling
+     * factor
+     * 
+     * @param direction Direction of the integers along a particular axis
+     * @param scaling   scaling factor to multiply the maximum distance in a
+     *                  direction by
+     * @return Iterator from (start of direction to end of direction, multiplied by
+     *         the scaling factor)
+     */
+    private Iterator<Integer> getLoop(Direction direction, int scaling) {
+        int loopEnd = 0;
+        switch (direction) {
+            case X_POS:
+            case X_NEG:
+                loopEnd = xMax * scaling;
+                break;
+            case Y_POS:
+            case Y_NEG:
+                loopEnd = yMax * scaling;
+                break;
+            case Z_POS:
+            case Z_NEG:
             default:
-                return generateList((scaled ? zMax * scale : zMax), dimension == Dimension.Z_MINUS).iterator();
+                loopEnd = zMax * scaling;
+                break;
         }
-    }
-
-    private List<Integer> generateList(int end, boolean reversed) {
-        List<Integer> list = IntStream.range(0, end).boxed().collect(Collectors.toList());
-        if (reversed) {
+        List<Integer> list = IntStream.range(0, loopEnd).boxed().collect(Collectors.toList());
+        if (direction.isNegative()) {
             Collections.reverse(list);
         }
-        return list;
+        return list.iterator();
     }
 
     /**
@@ -330,9 +396,9 @@ public class ManipulatablePosition {
      */
     private int[] unscramble(int outer, int middle, int inner) {
         int[] result = new int[3];
-        result[ordering[2].getPosIndex()] = outer;
+        result[ordering[0].getPosIndex()] = outer;
         result[ordering[1].getPosIndex()] = middle;
-        result[ordering[0].getPosIndex()] = inner;
+        result[ordering[2].getPosIndex()] = inner;
         return result;
     }
 }

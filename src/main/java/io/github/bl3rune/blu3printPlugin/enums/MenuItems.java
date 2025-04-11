@@ -6,8 +6,9 @@ import org.bukkit.Material;
 public enum MenuItems {
 
     DUPLICATE("Duplicate", "Duplicate a blu3print", Material.PURPUR_BLOCK, 2),
-    FACE("Change Side Facing", "Change the side facing you of a blu3print", Material.PURPUR_SLAB),
-    ROTATE("Rotate", "Rotate a blu3print", Material.PURPUR_STAIRS),
+    FACE("Change Side Facing", "Change the side facing you of a blu3print", Material.DISPENSER),
+    ROTATE("Rotate", "Rotate a blu3print", Material.COMPASS),
+    TURN("Turn", "Turn a blu3print", Material.PURPUR_STAIRS),
     EXPORT("Export", "Export a blu3print", Material.CHEST_MINECART),
     SCALE("Change Scale", "Double the size of a blu3print, or set specified scale", Material.PURPUR_PILLAR),
     GIVE("Give", "Give a blu3print writer", Material.CHEST),

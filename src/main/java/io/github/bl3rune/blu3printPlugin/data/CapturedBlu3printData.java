@@ -4,22 +4,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
+import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 import io.github.bl3rune.blu3printPlugin.utils.LocationUtils;
+import io.github.bl3rune.blu3printPlugin.utils.Pair;
+
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.VOID;
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.ROW_END;
+import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.COLUMN_END;
 
 public class CapturedBlu3printData extends Blu3printData {
 
@@ -34,12 +37,12 @@ public class CapturedBlu3printData extends Blu3printData {
 
         String world = loc1.getWorld().getName();
         if (!world.equals(loc2.getWorld().getName())) {
-            player.sendMessage(ChatColor.RED + "I didn't think I would have to say this...");
-            player.sendMessage(ChatColor.RED + "...");
-            player.sendMessage(ChatColor.RED + "But the two locations have to be in the same world...");
-            player.sendMessage(ChatColor.RED + "...");
-            player.sendMessage(ChatColor.RED + "...");
-            player.sendMessage(ChatColor.RED + "Take a break for a bit friend.");
+            sendMessage(player,ChatColor.RED + "I didn't think I would have to say this...");
+            sendMessage(player,ChatColor.RED + "...");
+            sendMessage(player,ChatColor.RED + "But the two locations have to be in the same world...");
+            sendMessage(player,ChatColor.RED + "...");
+            sendMessage(player,ChatColor.RED + "...");
+            sendMessage(player,ChatColor.RED + "Take a break for a bit friend.");
             return;
         }
 
@@ -52,9 +55,9 @@ public class CapturedBlu3printData extends Blu3printData {
         int zSize = locZ[1] - locZ[0] + 1;
 
         Integer maxSize = Blu3printConfiguration.getMaxSize();
-        if (player != null && maxSize != null && (xSize > maxSize || ySize > maxSize || zSize > maxSize)) {
+        if (player != null && maxSize != null && sizesExceedLimit(new int[] {xSize,ySize,zSize}, 1, maxSize)) {
             if (!player.hasPermission("blu3print.no-size-limit")) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
                 return;
             }
         }
@@ -73,26 +76,20 @@ public class CapturedBlu3printData extends Blu3printData {
                     if (isBlockIgnorable(block) || ignoreBlocks.stream().anyMatch(
                                 i -> LocationUtils.locationsMatch(LocationUtils.getCoordsFromPosString(i), block.getLocation())
                             )) {
-                        selectionGrid[z][y][x] = new MaterialData(null, Material.AIR, null, 1);
+                        selectionGrid[z][y][x] = new ImportedMaterialData(null, Material.AIR, null, 1);
                     } else {
-                        BlockFace face = null;
                         String blockName = block.getType().name();
-                        if (block instanceof Directional) {
-                            Directional directional = (Directional) block;
-                            Orientation orientation = Orientation.getOrientation(directional.getFacing());
-                            face = orientation.getBlockFace();
-                            blockName = orientation.getDescription() + MODIFIER + blockName;
-                        }
                         ingredientsCount.put(block.getType().name(), ingredientsCount.getOrDefault(block.getType().name(), 0) + 1);
-                        ingredientsCountWithDirection.put(blockName, ingredientsCount.getOrDefault(blockName, 0) + 1);
-                        MaterialData materialData = new MaterialData(blockName, block.getType(), face, 1);
+                        MaterialData materialData = new CapturedMaterialData(block);
+                        ingredientsCountWithDirection.put(materialData.getName(), ingredientsCount.getOrDefault(blockName, 0) + 1);
                         selectionGrid[z][y][x] = materialData;
                     }
                 }
             }
         }
 
-        String header = buildHeaderIngredients(ingredientsCountWithDirection);
+        this.ingredientsMap = EncodingUtils.buildIngredientsMapFromIngredientsCount(ingredientsCountWithDirection);
+        String header = EncodingUtils.ingredientsMapToString(ingredientsMap);
 
         List<ManipulatablePosition> positions = new ArrayList<>();
         for (Orientation o : Orientation.values()) {
@@ -101,62 +98,28 @@ public class CapturedBlu3printData extends Blu3printData {
             positions.add(new ManipulatablePosition(zSize, ySize, xSize, o, Rotation.BOTTOM));
             positions.add(new ManipulatablePosition(zSize, ySize, xSize, o, Rotation.LEFT));
         }
-        
-        positions = positions.parallelStream().map(p -> do3dLoop(p)).sorted(
-            (p1,p2) -> Integer.compare(p1.getEncoding().length(), p2.getEncoding().length())
-        ).collect(Collectors.toList());
+        Pair<String, ManipulatablePosition> bestPosition = positions.parallelStream().map(p -> new Pair<String,ManipulatablePosition>(do3dLoop(p), p)).sorted(
+            (p1,p2) -> Integer.compare(p1.getA().length(), p2.getA().length())
+        ).findFirst().get();
 
-        this.position = positions.get(0);
-        header = buildHeaderWithPerspective(header);
+        this.position = bestPosition.getB();
+        header = EncodingUtils.buildHeaderWithPerspective(header, position);
         
-        this.encoded = header + HEADER_END + positions.get(0).getEncoding();
+        this.encoded = EncodingUtils.buildEncodedString(header, bestPosition.getA());
     }
 
-    private String buildHeaderIngredients(Map<String, Integer> ingredientsCountWithDirection) {
-        StringBuilder sb = new StringBuilder();
-        ingredientsMap = new HashMap<>();
-        int index = 1;
-        int secondCharIndex = -1;
-        // Sorted so most common keys are lower
-        List<String> sortedKeys = ingredientsCountWithDirection.entrySet().stream().sorted(
-            (o1, o2) -> o2.getValue().compareTo(o1.getValue())
-        ).map(i -> i.getKey()).collect(Collectors.toList());
-
-        for (String i : sortedKeys) {
-            if (index > 1 || secondCharIndex >= 0) {
-                sb.append(ROW_END);
-            } 
-            if (index == BLU3_ENCODE.size()) {
-                secondCharIndex++;
-                index = 0;
-            }
-            String code = secondCharIndex < 0 ? BLU3_ENCODE.get(index)
-                    : DOUBLE_CHARACTER + BLU3_ENCODE.get(secondCharIndex) + BLU3_ENCODE.get(index);
-            ingredientsMap.put(i, code);
-            sb.append(code);
-            sb.append(MAPS_TO);
-            sb.append(i);
-            index++;
-        }
-        return sb.toString();
-    }
-
-    private ManipulatablePosition do3dLoop(ManipulatablePosition position) {
+    private String do3dLoop(ManipulatablePosition position) {
         StringBuilder sb = new StringBuilder();
         String previous = null;
         int count = 0;
         boolean empty = true;
-        int [] coords = position.next();
+        int [] coords = position.next(false);
         while(coords !=  null) {
             MaterialData materialData = selectionGrid[coords[0]][coords[1]][coords[2]];
             if (materialData == null) {
-                materialData = new MaterialData(null, Material.AIR, null, 1);
+                materialData = new ImportedMaterialData(null, Material.AIR, null, 1);
             }
             String name = materialData.getName();
-            if  (materialData.getFace() != null)  {
-                Orientation orientation = Orientation.getOrientation(materialData.getFace());
-                name = orientation.getDescription() + MODIFIER + name;
-            }
             sb.append(determineEncoding(previous, name, count));
             if ((previous == null && name == null) || (name != null && name.equals(previous))) {
                 count++;
@@ -175,11 +138,10 @@ public class CapturedBlu3printData extends Blu3printData {
                 sb.append(position.endOfMiddleLoop() ? COLUMN_END : ROW_END);
                 empty = true;
             }
-            coords = position.next();
+            coords = position.next(false);
         }
         
-        position.setEncoding(sb.toString());
-        return position;
+        return sb.toString();
     }
 
     /**
@@ -198,9 +160,9 @@ public class CapturedBlu3printData extends Blu3printData {
     private String determineEncoding(String prev, String current, int count) {
         if (count == 0) return "";
         if (prev == null) {
-            if (current != null) return BLU3_ENCODE.get(0) + (count < 2 ? "" : count);
+            if (current != null) return VOID + (count < 2 ? "" : count);
         } else if (!prev.equals(current)) {
-            return ingredientsMap.getOrDefault(prev, BLU3_ENCODE.get(0)) + (count < 2 ? "" : count);
+            return ingredientsMap.getOrDefault(prev, VOID) + (count < 2 ? "" : count);
         }
         return "";
     }

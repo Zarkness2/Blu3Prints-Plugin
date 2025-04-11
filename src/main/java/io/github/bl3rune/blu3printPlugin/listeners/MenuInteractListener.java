@@ -39,6 +39,9 @@ public class MenuInteractListener implements Listener {
                 case FACE:
                     player.performCommand(CommandType.FACE.getFullCommandName());
                     break;
+                case TURN:
+                    player.performCommand(CommandType.TURN.getFullCommandName());
+                    break;
                 case GIVE:
                     player.performCommand(CommandType.GIVE.getFullCommandName());
                     break;

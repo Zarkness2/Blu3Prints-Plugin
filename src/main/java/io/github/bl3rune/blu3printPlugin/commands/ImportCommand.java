@@ -49,7 +49,7 @@ public class ImportCommand implements CommandExecutor {
             if (uuid == null) {
                 uuid = UUID.randomUUID().toString();
             }
-            Blu3printItem blu3print = Blu3printItem.getFinishedBlu3print(uuid, player, args[0], true);
+            Blu3printItem blu3print = Blu3printItem.getFinishedBlu3print(uuid, "imported by" + player.getDisplayName(), args[0], true);
             Blu3printData blu3printData = new ImportedBlu3printData(player, args[1]);
             if (blu3printData.getPosition() == null) return true;
             instance.saveOrUpdateCachedBlu3print(uuid, blu3printData);

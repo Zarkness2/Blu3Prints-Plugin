@@ -1,5 +1,5 @@
 name: Blu3PrintPlugin
-version: '1.2.4'
+version: '1.3.0'
 main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
 api-version: '1.18'
 prefix: Blu3PrintPlugin
@@ -25,6 +25,12 @@ commands:
     permission: blu3print.rotate
     permission-message: You don't have permission to do this
     aliases: [ blu3.rotate ]
+  blu3print.turn:
+    description: Turn the Blu3Print currently held
+    usage: /<command> <turn>
+    permission: blu3print.turn
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.turn ]
   blu3print.face:
     description: Change the direction of the Blu3Print currently held
     usage: /<command> <#optional# direction> (default next face)
@@ -73,6 +79,7 @@ permissions:
       blu3print: true
       blu3print.duplicate: true
       blu3print.rotate: true
+      blu3print.turn: true
       blu3print.face: true
       blu3print.import: true
       blu3print.export: true
@@ -91,6 +98,7 @@ permissions:
       blu3print: true
       blu3print.duplicate: true
       blu3print.rotate: true
+      blu3print.turn: true
       blu3print.face: true
       blu3print.import: true
       blu3print.export: true
@@ -103,6 +111,8 @@ permissions:
     description: Allowed to duplicate the complete Blu3Print currently held
   blu3print.rotate:
     description: Allowed to rotate the Blu3Print currently held
+  blu3print.turn:
+    description: Allowed to turn the Blu3Print currently held
   blu3print.face:
     description: Allowed to change the direction of the Blu3Print currently held
   blu3print.import:

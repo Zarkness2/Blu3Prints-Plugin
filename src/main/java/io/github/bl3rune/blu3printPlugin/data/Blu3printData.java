@@ -146,7 +146,7 @@ public abstract class Blu3printData {
                 world.setBlockData(location, blockData);
             } catch (Exception e) { 
                 /* Tried to apply invalid block data */
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
         return true;

@@ -13,3 +13,11 @@ blu3print:
     - WATER
     - LAVA
     - GRASS
+  messaging: # Fine tune messaging for the Blu3Print plugin
+    free-placement-message:
+      enabled: true
+    force-placement-message:
+      enabled: true
+    discount-placement-message:
+      enabled: true
+    

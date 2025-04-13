@@ -3,7 +3,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/bl3rune/Blu3Prints-Plugin)](https://github.com/bl3rune/Blu3Prints-Plugin/releases)
 [![Build Status](https://github.com/bl3rune/Blu3Prints-Plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/bl3rune/Blu3Prints-Plugin/actions)
 
-### **A blueprint tool that allows players to capture/share/maniupulate designs within Minecraft** 
+### **A blueprint tool that allows players to capture/share/manipulate designs within Minecraft** 
 ### Blu3prints are placed using blocks in inventory in survival (or free in creative mode / with permissions)
 
 ![Banner](/images/Banner.png "Banner")

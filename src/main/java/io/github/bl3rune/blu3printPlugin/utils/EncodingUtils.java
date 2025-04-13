@@ -60,12 +60,12 @@ public class EncodingUtils {
         return sb.toString();
     }
 
-    public static Map<String,String> buildIngredientsMapFromIngredientsCount(Map<String, Integer> ingredientsCountWithDirection) {
+    public static Map<String,String> buildIngredientsMapFromIngredientsCount(Map<String, Integer> ingredientsCountComplex) {
         Map<String,String> ingredientsMap = new HashMap<>();
         int index = 1;
         int secondCharIndex = -1;
         // Sorted so most common keys are lower
-        List<String> sortedKeys = ingredientsCountWithDirection.entrySet().stream().sorted(
+        List<String> sortedKeys = ingredientsCountComplex.entrySet().stream().sorted(
             (o1, o2) -> o2.getValue().compareTo(o1.getValue())
         ).map(i -> i.getKey()).collect(Collectors.toList());
 

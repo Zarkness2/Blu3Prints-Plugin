@@ -62,11 +62,10 @@ public abstract class Blu3printData {
         StringBuilder sb = new StringBuilder();
 
         sb.append(ChatColor.WHITE).append("Ingredients:").append("\n").append(ChatColor.GRAY);
-        ingredientsCount.forEach((k, v) -> sb.append(" - ").append(k).append(" : ")
+        ingredientsCount.forEach((k, v) -> sb.append(" - ")
+                .append(k.replace("_", " "))
+                .append(" : ")
                 .append(v * position.getScalingIngredientsMultiplier()).append("\n"));
-
-        sb.append(ChatColor.WHITE).append("Map:").append("\n").append(ChatColor.GRAY);
-        ingredientsMap.forEach((k, v) -> sb.append(" - ").append(k).append(" : ").append(v).append("\n"));
 
         sb.append(ChatColor.WHITE).append("Position:").append("\n").append(ChatColor.GRAY);
         sb.append(" - X Size :").append(position.getXSize() * position.getScale()).append("\n");
@@ -86,7 +85,7 @@ public abstract class Blu3printData {
         Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false, blocksUnableToPlace);
         if (!missingBlocks.isEmpty()) {
             sendMessage(player, ChatColor.RED + "Missing these blocks to place the blu3print:");
-            missingBlocks.forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k + " : " + v));
+            missingBlocks.forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k.replace("_", " ") + " : " + v));
             return;
         }
 
@@ -144,7 +143,7 @@ public abstract class Blu3printData {
             try {
                 BlockData blockData = Bukkit.createBlockData(complexData);
                 world.setBlockData(location, blockData);
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 /* Tried to apply invalid block data */
                 // e.printStackTrace();
             }
@@ -297,11 +296,10 @@ public abstract class Blu3printData {
             }
             Block block = world.getBlockAt(x + coords[2], y + coords[1], z + coords[0]);
             if (block != null && !isBlockIgnorable(block)) {
-                Integer count = blocksUnableToPlace.getOrDefault(materialData.getName(), 0);
-                blocksUnableToPlace.put(materialData.getName(), count + 1);
+                Integer count = blocksUnableToPlace.getOrDefault(materialData.getMaterial().name(), 0);
+                blocksUnableToPlace.put(materialData.getMaterial().name(), count + 1);
             }
             coords = position.next(true);
-
         }
         return blocksUnableToPlace;
     }
@@ -378,7 +376,7 @@ public abstract class Blu3printData {
         String newHeader = EncodingUtils
                 .buildHeaderWithPerspective(EncodingUtils.ingredientsMapToString(ingredientsMap), newPosition);
         String newEncoding = EncodingUtils.buildEncodedString(newHeader, bodyString);
-        System.out.println("Updated blu3print: " + newEncoding);
+        sendMessage(null, "Updated blu3print: " + newEncoding);
         return newEncoding;
     }
 

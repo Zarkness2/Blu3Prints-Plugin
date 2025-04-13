@@ -102,8 +102,8 @@ public class ImportedBlu3printData extends Blu3printData {
             this.selectionGrid[coords[0]][coords[1]][coords[2]] = materialData;
         }
         if (materialData.getName() != null) {
-            int count = this.ingredientsCount.getOrDefault(materialData.getName(), 0);
-            this.ingredientsCount.put(materialData.getName(), count + materialData.getCount());
+            int count = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
+            this.ingredientsCount.put(materialData.getMaterial().name(), count + materialData.getCount());
         }
     }
 
@@ -116,8 +116,8 @@ public class ImportedBlu3printData extends Blu3printData {
             added++;
         }
         if (materialData.getName() != null) {
-            int count = this.ingredientsCount.getOrDefault(materialData.getName(), 0);
-            this.ingredientsCount.put(materialData.getName(), count + added);
+            int count = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
+            this.ingredientsCount.put(materialData.getMaterial().name(), count + added);
         }
     }
 

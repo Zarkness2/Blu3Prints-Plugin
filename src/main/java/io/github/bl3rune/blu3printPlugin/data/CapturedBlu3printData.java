@@ -67,7 +67,7 @@ public class CapturedBlu3printData extends Blu3printData {
         selectionGrid = new MaterialData[zSize][ySize][xSize];
         this.ingredientsCount = new HashMap<>();
         this.ingredientsMap = new HashMap<>();
-        Map<String, Integer> ingredientsCountWithDirection = new HashMap<>();
+        Map<String, Integer> ingredientsCountComplex = new HashMap<>();
 
         for (int z = 0; z < zSize; z++) {
             for (int y = 0; y < ySize; y++) {
@@ -79,16 +79,16 @@ public class CapturedBlu3printData extends Blu3printData {
                         selectionGrid[z][y][x] = new ImportedMaterialData(null, Material.AIR, null, 1);
                     } else {
                         String blockName = block.getType().name();
-                        ingredientsCount.put(block.getType().name(), ingredientsCount.getOrDefault(block.getType().name(), 0) + 1);
+                        ingredientsCount.put(blockName, ingredientsCount.getOrDefault(blockName, 0) + 1);
                         MaterialData materialData = new CapturedMaterialData(block);
-                        ingredientsCountWithDirection.put(materialData.getName(), ingredientsCount.getOrDefault(blockName, 0) + 1);
+                        ingredientsCountComplex.put(materialData.getName(), ingredientsCountComplex.getOrDefault(materialData.getName(), 0) + 1);
                         selectionGrid[z][y][x] = materialData;
                     }
                 }
             }
         }
 
-        this.ingredientsMap = EncodingUtils.buildIngredientsMapFromIngredientsCount(ingredientsCountWithDirection);
+        this.ingredientsMap = EncodingUtils.buildIngredientsMapFromIngredientsCount(ingredientsCountComplex);
         String header = EncodingUtils.ingredientsMapToString(ingredientsMap);
 
         List<ManipulatablePosition> positions = new ArrayList<>();

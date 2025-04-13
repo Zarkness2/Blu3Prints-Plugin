@@ -94,9 +94,17 @@ public class PlayerInteractListener implements Listener {
         } else if (Blu3printItem.isBlu3print(item, false)) {
             event.setCancelled(true);
             if (isLeftClickBlockEvent(action)) {
-                placeBlu3print(player, block, item);
+                if (player.isSneaking()) {
+                    placeBlu3print(player, block, item, false, true);
+                } else {
+                    placeBlu3print(player, block, item, true, true);
+                }
             } else if (isRightClickBlockEvent(action)) {
-                explainBlu3print(player, item);
+                if (player.isSneaking()) {
+                    placeBlu3print(player, block, item, true, false);
+                } else {
+                    explainBlu3print(player, item);
+                }
             }
         }
     }
@@ -160,7 +168,7 @@ public class PlayerInteractListener implements Listener {
         item = persistDataKey(item, "location2-" + player.getUniqueId().toString(), locationStringFormat(location));
     }
 
-    private void placeBlu3print(Player player, Block block, ItemStack item) {
+    private void placeBlu3print(Player player, Block block, ItemStack item, boolean forced, boolean onTop) {
         ItemMeta meta = item.getItemMeta();
         List<String> lore = meta.getLore();
         if (lore.size() < 2) {
@@ -174,7 +182,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         Location startLocation = block.getLocation();
-        blu3printItem.placeBlocks(player, startLocation);
+        blu3printItem.placeBlocks(player, startLocation, forced, onTop);
     }
 
     private void explainBlu3print(Player player, ItemStack item) {

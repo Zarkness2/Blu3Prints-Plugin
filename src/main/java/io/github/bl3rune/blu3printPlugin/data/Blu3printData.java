@@ -79,8 +79,8 @@ public abstract class Blu3printData {
 
     // PLACING BLU3PRINT SECTION
 
-    public void placeBlocks(Player player, Location location) {
-        Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(location);
+    public void placeBlocks(Player player, Location location, boolean forced, boolean onTop) {
+        Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(location, onTop);
 
         Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false, blocksUnableToPlace);
         if (!missingBlocks.isEmpty()) {
@@ -90,9 +90,9 @@ public abstract class Blu3printData {
         }
 
         if (!blocksUnableToPlace.isEmpty()) {
-            if (player.isSneaking()) {
+            if (forced && Blu3printConfiguration.isForcePlacementMessageEnabled()) {
                 sendMessage(player, ChatColor.AQUA + "Forcing placing blu3print despite blocks in the way.");
-            } else {
+            } else if (!forced) {
                 sendMessage(player, ChatColor.RED + "You can't place the blu3print here. There are blocks in the way.");
                 sendMessage(player,
                         ChatColor.RED + "To force placement of the blu3print, sneak while using the blu3print.");
@@ -113,7 +113,7 @@ public abstract class Blu3printData {
             }
 
             int x = location.getBlockX() + coords[2];
-            int y = location.getBlockY() + 1 + coords[1];
+            int y = location.getBlockY() + (onTop ? 1 : 0) + coords[1];
             int z = location.getBlockZ() + coords[0];
 
             Location placeLocation = new Location(location.getWorld(), x, y, z);
@@ -154,7 +154,7 @@ public abstract class Blu3printData {
     private Map<String, Integer> checkPlayerHasBLocksInInventory(Player player, boolean removeBlocks,
             Map<String, Integer> blocksUnableToPlace) {
         if (player.getGameMode() == GameMode.CREATIVE || player.hasPermission("blu3print.no-block-cost")) {
-            if (removeBlocks) {
+            if (removeBlocks && Blu3printConfiguration.isFreePlacementMessageEnabled()) {
                 sendMessage(player, ChatColor.GREEN + "Placing Blu3print for free!");
             }
             return new HashMap<>();
@@ -164,6 +164,9 @@ public abstract class Blu3printData {
 
         // Discount blocks unable to place
         if (player.isSneaking() && player.hasPermission("blu3print.force-place-discount")) {
+            if (Blu3printConfiguration.isDiscountPlacementMessageEnabled()) {
+                sendMessage(player, ChatColor.GREEN + "Placing Blu3print for discount as blocks in the way!");
+            }
             blocksUnableToPlace.forEach((material, amount) -> {
                 Integer count = ingCountCopy.getOrDefault(material, 0);
                 count = count - amount;
@@ -280,10 +283,10 @@ public abstract class Blu3printData {
         return ingCountCopy;
     }
 
-    private Map<String, Integer> checkSpaceIsClear(Location location) {
+    private Map<String, Integer> checkSpaceIsClear(Location location, boolean onTop) {
         World world = Bukkit.getWorld(location.getWorld().getName());
         int x = location.getBlockX();
-        int y = location.getBlockY() + 1;
+        int y = location.getBlockY() + (onTop ? 1 : 0);
         int z = location.getBlockZ();
         int scale = position.getScale();
         int[] coords = position.next(true);

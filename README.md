@@ -2,6 +2,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/bl3rune/Blu3Prints-Plugin)](https://github.com/bl3rune/Blu3Prints-Plugin/releases)
 [![Build Status](https://github.com/bl3rune/Blu3Prints-Plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/bl3rune/Blu3Prints-Plugin/actions)
+![Minimum MC Version](https://img.shields.io/badge/Spigot_Versions-v1.18_--_v1.21.5-orange)
 
 ### **A blueprint tool that allows players to capture/share/manipulate designs within Minecraft** 
 ### Blu3prints are placed using blocks in inventory in survival (or free in creative mode / with permissions)
@@ -65,10 +66,11 @@ With the blu3print writer open:
 ![Blu3print](/images/Completed.png "Blu3print")
 
 While holding a completed Blu3print, you can interact by:
-- Using left click on a block to build the blu3print on top of that block
 - Blocks are always placed from the most northwest corner of the design (minimum x and z axis coordinate)
+- Using left click on a block to build the blu3print on top of that block
 - Using left click (while sneaking) on a block to build the blu3print from that block even if there are blocks in the way
 - Using right click to print an explanation of the blu3print to chat like below
+- Using right click (while sneaking) on a block to force place on the same height as the block clicked (useful for bridges)
 
 ![Explain](/images/Explain.png "Explain")
 
@@ -107,11 +109,12 @@ To use the encoded blu3prints, simply run the command `/blu3print.import <name> 
 - "~" Header end separator
 #### Body section
 Encoded structure of the blu3print e.g.
-- "B-" >> OAK_LOGS until end of row
-- "BA-" >> 1 OAK_LOGS and then AIR until end of row
-- "B2A-" >> 2 OAK_LOGS and then AIR until end of row
-- "ACA|" >> AIR, OAK_PLANK, AIR until end of row, END OF COLUMN
-- "-" >> AIR until end of row
+- "B-" >> OAK_LOGS until, END OF ROW
+- "BA-" >> 1 OAK_LOGS and then AIR until, END OF ROW
+- "B2A-" >> 2 OAK_LOGS and then AIR until, END OF ROW
+- "ACA|" >> AIR, OAK_PLANK, AIR until, END OF COLUMN
+- "-" >> AIR until, END OF ROW
+
 - ...
 
 
@@ -146,12 +149,19 @@ This plugin is fairly plug-and-play, simply place inside the `plugins` folder of
 the server. 
 
 Configuration can be found in the `config.yml` file. 
-- `blu3print.max-size` - Maximum size of any one side of a blu3print (default 100 blocks)
-- `blu3print.max-scale` - Maximum scale of blu3print (default 10 blocks)
-- `blu3print.max-overall-size` - Maximum size of any one side of a blu3print times the scale (default 200 blocks)
-- `blu3print.cooldown` - Minimum time in milliseconds between using Blu3print items / writer
-- `blu3print.recipe.ingredients` - Customisable list of ingredients used in crafting the blu3print writer
-- `blu3print.ignored-materials` - Customisable list of materials to ignore when building / placing blu3prints
+| Configuration | default  | description |
+| :---:  | :---:   | :---: |
+| blu3print.max-size` | 100 (blocks) |  Maximum size of any one side of a blu3print |
+| blu3print.max-scale | 10 (multiplier) | Maximum scale of blu3print |
+| blu3print.max-overall-size | 200 (blocks) | Maximum size of any one side of a blu3print times the scale |
+| blu3print.cooldown | 500 (milliseconds) | Minimum time between using Blu3print items / writer |
+| blu3print.recipe.ingredients | PAPER, LAPIS_LAZULI, FEATHER | List of ingredients used in crafting the blu3print writer |
+| blu3print.ignored-materials | AIR, WATER, LAVA, GRASS | List of materials to ignore when building / placing blu3prints |
+| **Messaging** | blu3print.messaging.* | Fine tune messaging for the Blu3Print plugin |
+| *.free-placement-message.enabled | true | Enable free placement message |
+| *.force-placement-message.enabled | true | Enable force placement message |
+| *.discount-placement-message.enabled | true | Enable discount placement message |
+
 
 
 ## License

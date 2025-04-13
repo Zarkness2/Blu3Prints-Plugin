@@ -12,6 +12,9 @@ public class Blu3printConfiguration {
     private static Integer maxOverallSize = null;
     private static Integer cooldown = null;
     private static List<String> ignoredMaterials;
+    private static boolean freePlacementMessageEnabled = false;
+    private static boolean forcePlacementMessageEnabled = false;
+    private static boolean discountPlacementMessageEnabled = false;
 
     public static void refreshConfiguration() {
         maxSize = tryAndGetConfig("blu3print.max-size");
@@ -19,6 +22,10 @@ public class Blu3printConfiguration {
         maxOverallSize = tryAndGetConfig("blu3print.max-overall-size");
         cooldown = tryAndGetConfig("blu3print.cooldown");
         ignoredMaterials = tryAndGetConfigList("blu3print.ignored-materials");
+        // Message settings
+        freePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.free-placement-message.enabled");
+        forcePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.force-placement-message.enabled");
+        discountPlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.discount-placement-message.enabled");
     }
 
     private static Integer tryAndGetConfig(String key) {
@@ -35,6 +42,14 @@ public class Blu3printConfiguration {
             return Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getStringList(key);
         } catch (Exception e) {
             return Arrays.asList("AIR");
+        }
+    }
+
+    private static boolean tryAndGetConfigFlag(String key) {
+        try {
+            return Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getBoolean(key, false);
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -59,6 +74,18 @@ public class Blu3printConfiguration {
 
     public static List<String> getIgnoredMaterials() {
         return ignoredMaterials;
+    }
+
+    public static boolean isFreePlacementMessageEnabled() {
+        return freePlacementMessageEnabled;
+    }
+
+    public static boolean isForcePlacementMessageEnabled() {
+        return forcePlacementMessageEnabled;
+    }
+
+    public static boolean isDiscountPlacementMessageEnabled() {
+        return discountPlacementMessageEnabled;
     }
 
 }

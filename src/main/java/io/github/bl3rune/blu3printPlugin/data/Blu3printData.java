@@ -180,7 +180,7 @@ public abstract class Blu3printData {
         boolean endOfInventory = false;
         Inventory inventory = player.getInventory();
 
-        // Filter out storage blocks to a seperate list
+        // Filter out storage blocks to a separate list
         while (!endOfInventory && inventoryIndex < inventory.getSize()) {
             try {
                 ItemStack itemStack = inventory.getItem(inventoryIndex);

@@ -3,9 +3,12 @@
 [![Latest Release](https://img.shields.io/github/v/release/bl3rune/Blu3Prints-Plugin)](https://github.com/bl3rune/Blu3Prints-Plugin/releases)
 [![Build Status](https://github.com/bl3rune/Blu3Prints-Plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/bl3rune/Blu3Prints-Plugin/actions)
 
+### **A blueprint tool that allows players to capture/share/maniupulate designs within Minecraft** 
+### Blu3prints are placed using blocks in inventory in survival (or free in creative mode / with permissions)
+
 ![Banner](/images/Banner.png "Banner")
 
-**Allows players to copy/paste/export/import blocks using blu3prints and using blocks in inventory** (or for free if in creative mode)
+
 ![usage!](/images/Blu3print.gif "Usage")
 
 ## Basic Usage tutorial
@@ -63,7 +66,7 @@ With the blu3print writer open:
 
 While holding a completed Blu3print, you can interact by:
 - Using left click on a block to build the blu3print on top of that block
-- Blocks are alwawys placed from the most northwest corner of the design (minimum x and z axis coordinate)
+- Blocks are always placed from the most northwest corner of the design (minimum x and z axis coordinate)
 - Using left click (while sneaking) on a block to build the blu3print from that block even if there are blocks in the way
 - Using right click to print an explanation of the blu3print to chat like below
 
@@ -92,16 +95,16 @@ To use the encoded blu3prints, simply run the command `/blu3print.import <name> 
 ------
 #### Header section
 - Ingredient Mapping section >> B=OAK_LOGS-C=OAK_PLANKS (A is always AIR)
-- "|" seperator
+- "|" separator
 - Sizes section >> 4:4:4 >> X-Size : Y-Size : Z-Size 
-- "|" seperator
+- "|" separator
 - Directional and scaling data section:
     - Direction Facing (N=NORTH, S=SOUTH, E=EAST, W=WEST, U=UP, D=DOWN)
-    - ":" seperator
+    - ":" separator
     - Rotation (TOP=0, RIGHT=1, BOTTOM=2, LEFT=3)
-    - ":" seperator
+    - ":" separator
     - Scaling (1=Default Size, 2=Twice as big in every direction, ...)
-- "~" Header end seperator
+- "~" Header end separator
 #### Body section
 Encoded structure of the blu3print e.g.
 - "B-" >> OAK_LOGS until end of row

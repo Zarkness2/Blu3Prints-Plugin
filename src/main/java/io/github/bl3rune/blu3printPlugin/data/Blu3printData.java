@@ -34,6 +34,7 @@ public abstract class Blu3printData {
     protected MaterialData[][][] selectionGrid; // [z] [y] [x]
     protected Map<String, Integer> ingredientsCount; // key: material, value: count
     protected Map<String, String> ingredientsMap; // key: material, value: encoded
+    protected Map<String, String> complexDataMap; // key: complex-mapping, value: complex-encoding
     protected ManipulatablePosition position;
     protected String encoded;
 
@@ -47,6 +48,10 @@ public abstract class Blu3printData {
 
     public Map<String, String> getIngredientsMap() {
         return ingredientsMap;
+    }
+
+    public Map<String, String> getComplexDataMap() {
+        return complexDataMap;
     }
 
     public ManipulatablePosition getPosition() {
@@ -68,9 +73,9 @@ public abstract class Blu3printData {
                 .append(v * position.getScalingIngredientsMultiplier()).append("\n"));
 
         sb.append(ChatColor.WHITE).append("Position:").append("\n").append(ChatColor.GRAY);
-        sb.append(" - X Size :").append(position.getXSize() * position.getScale()).append("\n");
-        sb.append(" - Y Size :").append(position.getYSize() * position.getScale()).append("\n");
-        sb.append(" - Z Size :").append(position.getZSize() * position.getScale()).append("\n");
+        sb.append(" - X:Y:Z Sizes :").append(position.getXSize() * position.getScale()).append(" : ");
+        sb.append(position.getYSize() * position.getScale()).append(" : ");
+        sb.append(position.getZSize() * position.getScale()).append("\n");
         sb.append(" - Orientation :").append(position.getOrientation().name()).append("\n");
         sb.append(" - Rotation :").append(position.getRotation().name()).append("\n");
         sb.append(" - Scale :").append(position.getScale()).append("\n");
@@ -394,8 +399,7 @@ public abstract class Blu3printData {
     }
 
     protected boolean isBlockIgnorable(Block block) {
-        return block == null || block.isEmpty() || block.isLiquid()
-                || materialIgnoreList.contains(block.getType().name());
+        return block == null || block.isEmpty() || materialIgnoreList.contains(block.getType().name());
     }
 
     protected boolean sizesExceedLimit(int[] sizes, int scale, int max) {

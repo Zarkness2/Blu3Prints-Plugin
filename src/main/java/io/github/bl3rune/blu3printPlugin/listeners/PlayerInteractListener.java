@@ -95,9 +95,9 @@ public class PlayerInteractListener implements Listener {
             event.setCancelled(true);
             if (isLeftClickBlockEvent(action)) {
                 if (player.isSneaking()) {
-                    placeBlu3print(player, block, item, false, true);
-                } else {
                     placeBlu3print(player, block, item, true, true);
+                } else {
+                    placeBlu3print(player, block, item, false, true);
                 }
             } else if (isRightClickBlockEvent(action)) {
                 if (player.isSneaking()) {

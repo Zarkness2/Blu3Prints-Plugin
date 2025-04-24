@@ -16,6 +16,10 @@ public class LocationUtils {
         return new Location(Bukkit.getWorld(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]), Integer.parseInt(pos[3]));
     }
 
+    public static String locationStringFormat(Location location) {
+        return String.format("%s:%d:%d:%d", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
     public static int[] reorderNegativeCoords(int pos1, int pos2) {
         if (pos1 > pos2) {
             return new int[] { pos2, pos1 };

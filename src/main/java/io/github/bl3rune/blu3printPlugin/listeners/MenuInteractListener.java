@@ -20,6 +20,9 @@ public class MenuInteractListener implements Listener {
                 return;
 
             Player player = (Player) event.getWhoClicked();
+            if (event.getCurrentItem() == null) {
+                return;
+            }
             String itemName = event.getCurrentItem().getItemMeta().getDisplayName();
             MenuItems menuItem = MenuItems.getMenuItem(itemName);
             if (menuItem == null) return;

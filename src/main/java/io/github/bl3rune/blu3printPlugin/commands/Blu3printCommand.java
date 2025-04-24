@@ -24,7 +24,7 @@ public class Blu3printCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if  (inventory == null) {
-                inventory = Bukkit.createInventory(player, 9, BLU3PRINT_MENU_STRING);
+                inventory = Bukkit.createInventory(player, 18, BLU3PRINT_MENU_STRING);
 
                 int index = 0;
                 for (MenuItems item : MenuItems.values()) {
@@ -32,6 +32,7 @@ public class Blu3printCommand implements CommandExecutor {
                     setItemMeta(menuItem, item.getFormattedName(), item.getFormattedDescription());
                     if (item.equals(MenuItems.EXIT)) {
                         inventory.setItem(8, menuItem);
+                        continue;
                     } else {
                         inventory.setItem(index, menuItem);
                     }

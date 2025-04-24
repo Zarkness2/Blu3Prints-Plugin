@@ -18,6 +18,7 @@ public class EncodingUtils {
     public static final String DOUBLE_CHARACTER = ".";
     public static final String MAPS_TO = "=";
     public static final String MODIFIER = ":";
+    public static final String CONDENSED = "!";
     public static final String VOID = "A";
 
     public static final String [] BLU3_ENCODE = new String[] {
@@ -45,7 +46,7 @@ public class EncodingUtils {
         return header + HEADER_END + body;
     }
 
-    // HEADER = INGREDIENTS + SIZES + DIRECTIONAL DATA
+    // HEADER = INGREDIENTS + SIZES + DIRECTIONAL DATA + CONDENSATION DATA
     public static String ingredientsMapToString(Map<String,String> map) { // key: material, value: encoded
         StringBuilder sb = new StringBuilder();
         map.forEach((k,v) -> {

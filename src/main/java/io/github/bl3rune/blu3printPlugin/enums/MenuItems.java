@@ -10,10 +10,16 @@ public enum MenuItems {
     ROTATE("Rotate", "Rotate a blu3print", Material.COMPASS),
     TURN("Turn", "Turn a blu3print", Material.PURPUR_STAIRS),
     EXPORT("Export", "Export a blu3print", Material.CHEST_MINECART),
-    SCALE("Change Scale", "Double the size of a blu3print, or set specified scale", Material.PURPUR_PILLAR),
+    SCALE("Change Scale", "Double the size of a blu3print, or set specified scale", Material.PURPUR_PILLAR, 2),
     GIVE("Give", "Give a blu3print writer", Material.CHEST),
     HELP("Help", "Get help", Material.EGG),
-    EXIT("Exit", "Exit the menu", Material.BARRIER);
+    EXIT("Exit", "Exit the menu", Material.BARRIER),
+    RESET_SCALE("Reset Scale", "Set the scale to default", Material.PURPUR_PILLAR),
+    FACE_NORTH("Change Side Facing North", "Change the side facing you of a blu3print to North", Material.COMPASS),
+    FACE_SOUTH("Change Side Facing South", "Change the side facing you of a blu3print to South", Material.COMPASS),
+    FACE_EAST("Change Side Facing East", "Change the side facing you of a blu3print to East", Material.COMPASS),
+    FACE_WEST("Change Side Facing West", "Change the side facing you of a blu3print to West", Material.COMPASS),
+    ;
 
     private String name;
     private String description;

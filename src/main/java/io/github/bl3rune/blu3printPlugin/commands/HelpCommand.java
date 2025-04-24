@@ -72,7 +72,9 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.WHITE + "While holding a completed Blu3print, you can interact by:");
         player.sendMessage(ChatColor.GRAY + "Using left click on a block to build the blu3print from that block");
         player.sendMessage(ChatColor.GRAY + "Using left click (while sneaking) on a block to build the blu3print from that block even if there are blocks in the way");
-        player.sendMessage(ChatColor.GRAY + "Using right click to explain the blu3print");
+        player.sendMessage(ChatColor.GRAY + "Using right click on the air to explain the blu3print");
+        player.sendMessage(ChatColor.GRAY + "Using right click on a block to place a holographic representaation of the blocks about to be placed");
+        player.sendMessage(ChatColor.GRAY + "Using right click (while sneaking) on a block to force place on the same height as the block clicked (useful for bridges)");
     }
 
     private void tableHelp(Player player)  {

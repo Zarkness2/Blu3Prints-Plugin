@@ -26,6 +26,9 @@ import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
 import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
+import io.github.bl3rune.blu3printPlugin.items.Hologram;
+
+import static io.github.bl3rune.blu3printPlugin.utils.LocationUtils.locationStringFormat;
 
 public class PlayerInteractListener implements Listener {
 
@@ -47,11 +50,6 @@ public class PlayerInteractListener implements Listener {
 
         Player player = event.getPlayer();
         Action action = event.getAction();
-
-        // Exit on invalid action
-        if (!isLeftClickBlockEvent(action) && !isRightClickBlockEvent(action)) {
-            return;
-        }
         
         ItemStack item = player.getInventory().getItemInMainHand();
 
@@ -73,7 +71,7 @@ public class PlayerInteractListener implements Listener {
 
         if (block != null) {
             if (block.getType().equals(Material.CARTOGRAPHY_TABLE)) {
-                if (isLeftClickBlockEvent(action)) {
+                if (actionEquals(action, Action.LEFT_CLICK_BLOCK)) {
                     return;
                 } // open menu on right click
                 event.setCancelled(true);
@@ -86,39 +84,33 @@ public class PlayerInteractListener implements Listener {
 
         if (Blu3printItem.isBlu3print(item, true)) {
             event.setCancelled(true);
-            if (isLeftClickBlockEvent(action)) {
+            if (actionEquals(action, Action.LEFT_CLICK_BLOCK)) {
                 firstBlockSelected(player, block, item);
-            } else if (isRightClickBlockEvent(action)) {
+            } else if (actionEquals(action, Action.RIGHT_CLICK_BLOCK)) {
                 secondBlockSelected(player, block, item);
             }
         } else if (Blu3printItem.isBlu3print(item, false)) {
             event.setCancelled(true);
-            if (isLeftClickBlockEvent(action)) {
+            if (actionEquals(action, Action.LEFT_CLICK_BLOCK)) {
                 if (player.isSneaking()) {
                     placeBlu3print(player, block, item, true, true);
                 } else {
                     placeBlu3print(player, block, item, false, true);
                 }
-            } else if (isRightClickBlockEvent(action)) {
+            } else if (actionEquals(action, Action.RIGHT_CLICK_BLOCK)) {
                 if (player.isSneaking()) {
                     placeBlu3print(player, block, item, true, false);
                 } else {
-                    explainBlu3print(player, item);
+                    placeHologram(player, block, item);
                 }
+            } else if (actionEquals(action, Action.RIGHT_CLICK_AIR)) {
+                explainBlu3print(player, item);
             }
         }
     }
 
-    private boolean isLeftClickBlockEvent(Action action) {
-       return action.name().equals(Action.LEFT_CLICK_BLOCK.name());
-    }
-
-    private boolean isRightClickBlockEvent(Action action) {
-        return action.name().equals(Action.RIGHT_CLICK_BLOCK.name());
-    }
-
-    private String locationStringFormat(Location location) {
-        return String.format("%s:%d:%d:%d", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    private boolean actionEquals(Action action1, Action action2) {
+       return action1.name().equals(action2.name());
     }
 
     private void firstBlockSelected(Player player, Block block, ItemStack item) {
@@ -183,6 +175,27 @@ public class PlayerInteractListener implements Listener {
 
         Location startLocation = block.getLocation();
         blu3printItem.placeBlocks(player, startLocation, forced, onTop);
+    }
+
+    private void placeHologram(Player player, Block block, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore = meta.getLore();
+
+        if (lore.size() < 2) {
+            player.sendMessage(ChatColor.RED + "Blu3print missing ID");
+            return;
+        }
+
+        Blu3printData blu3printData = instance.getBlu3printFrpmCache(lore.get(1));
+        
+        if (blu3printData == null) {
+            player.sendMessage(ChatColor.RED + "Blu3print ID missing from cache");
+            return;
+        }
+
+        Location startLocation = block.getLocation();
+        Hologram hologram = new Hologram(startLocation, blu3printData);
+        hologram.placeHologram();
     }
 
     private void explainBlu3print(Player player, ItemStack item) {

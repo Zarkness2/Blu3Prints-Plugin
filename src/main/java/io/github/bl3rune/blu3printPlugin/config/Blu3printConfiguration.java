@@ -11,6 +11,7 @@ public class Blu3printConfiguration {
     private static Integer maxScale = null;
     private static Integer maxOverallSize = null;
     private static Integer cooldown = null;
+    private static Integer hologramTtl = null;
     private static List<String> ignoredMaterials;
     private static boolean freePlacementMessageEnabled = false;
     private static boolean forcePlacementMessageEnabled = false;
@@ -21,6 +22,7 @@ public class Blu3printConfiguration {
         maxScale = tryAndGetConfig("blu3print.max-scale");
         maxOverallSize = tryAndGetConfig("blu3print.max-overall-size");
         cooldown = tryAndGetConfig("blu3print.cooldown");
+        hologramTtl = tryAndGetConfig("blu3print.hologram-ttl");
         ignoredMaterials = tryAndGetConfigList("blu3print.ignored-materials");
         // Message settings
         freePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.free-placement-message.enabled");
@@ -70,6 +72,13 @@ public class Blu3printConfiguration {
             return 0;
         }
         return cooldown;
+    }
+
+    public static Integer getHologramTtl() {
+        if (hologramTtl == null) {
+            return 10;
+        }
+        return hologramTtl;
     }
 
     public static List<String> getIgnoredMaterials() {

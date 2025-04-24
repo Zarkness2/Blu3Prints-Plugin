@@ -69,7 +69,8 @@ While holding a completed Blu3print, you can interact by:
 - Blocks are always placed from the most northwest corner of the design (minimum x and z axis coordinate)
 - Using left click on a block to build the blu3print on top of that block
 - Using left click (while sneaking) on a block to build the blu3print from that block even if there are blocks in the way
-- Using right click to print an explanation of the blu3print to chat like below
+- Using right click on the air to print an explanation of the blu3print to chat like below
+- Using right click on a block to place a holographic representaation of the blocks about to be placed (with no cost)
 - Using right click (while sneaking) on a block to force place on the same height as the block clicked (useful for bridges)
 
 ![Explain](/images/Explain.png "Explain")
@@ -157,6 +158,7 @@ Configuration can be found in the `config.yml` file.
 | blu3print.cooldown | 500 (milliseconds) | Minimum time between using Blu3print items / writer |
 | blu3print.recipe.ingredients | PAPER, LAPIS_LAZULI, FEATHER | List of ingredients used in crafting the blu3print writer |
 | blu3print.ignored-materials | AIR, WATER, LAVA, GRASS | List of materials to ignore when building / placing blu3prints |
+| blu3print.hologram-ttl | 10 (seconds) | Time in seconds before a hologram disappears after being placed |
 | **Messaging** | blu3print.messaging.* | Fine tune messaging for the Blu3Print plugin |
 | *.free-placement-message.enabled | true | Enable free placement message |
 | *.force-placement-message.enabled | true | Enable force placement message |

@@ -193,6 +193,11 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
+        if (!player.hasPermission("blu3print.holograms")) {
+            player.sendMessage(ChatColor.RED + "You do not have permission to place hologram previews!");
+            return;
+        }
+
         Location startLocation = block.getLocation();
         Hologram hologram = new Hologram(startLocation, blu3printData);
         hologram.placeHologram();

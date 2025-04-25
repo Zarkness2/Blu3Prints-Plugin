@@ -12,8 +12,8 @@
 
 ![usage!](/images/Blu3print.gif "Usage")
 
-## Basic Usage tutorial
-[![Watch the video](https://img.youtube.com/vi/iNgYVwC9tRA/maxresdefault.jpg)](https://www.youtube.com/watch?v=iNgYVwC9tRA)
+## Video tutorials playlist
+[![Watch the video](https://img.youtube.com/vi/iNgYVwC9tRA/maxresdefault.jpg)](https://www.youtube.com/watch?v=iNgYVwC9tRA&list=PLAnUQqo3m_n1ULxKJXg3neW2GYDa3U3Sj)
 
 ## Features
 - Craftable Blu3print writer item with customisable recipe
@@ -75,9 +75,6 @@ While holding a completed Blu3print, you can interact by:
 
 ![Explain](/images/Explain.png "Explain")
 
-## Advanced Usage tutorial
-[![Watch the advance video](https://img.youtube.com/vi/Cub94f1ckE8/maxresdefault.jpg)](https://www.youtube.com/watch?v=Cub94f1ckE8)
-
 ### Using Cartography Table to manipulate the Blu3prints
 ------
 The Cartography Table can be used to change the rotation, direction, scale of the blu3print.
@@ -138,6 +135,7 @@ There is also a default restrictions on the maximum size/scale of a blu3print fo
 | blu3print.no-scale-limit  | | No restrictions on scaling of Blu3prints |
 | blu3print.force-place-discount  | false | Force placing Blu3prints no longer costs blocks unable to place |
 | blu3print.no-block-cost  | false | Removes block cost for placing Blu3prints in survival |
+| blu3print.holograms | true | Allowed to place hologram previews of Blu3prints |
 
 
 ## Help

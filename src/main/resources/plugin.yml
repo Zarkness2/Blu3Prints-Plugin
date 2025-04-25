@@ -1,5 +1,5 @@
 name: Blu3PrintPlugin
-version: '1.4.1'
+version: '1.4.2'
 main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
 api-version: '1.18'
 prefix: Blu3Print
@@ -93,6 +93,7 @@ permissions:
       blu3print.give: true
       blu3print.help: true
       blu3print.holograms: true
+      blu3print.update-available-message: true
   blu3print.basics:
     description: Allowed to use Blu3Prints
     default: not op
@@ -142,3 +143,6 @@ permissions:
     description: Allowed to ask for help with the Blu3PrintPlugin
   blu3print.holograms:
     description: Allowed to place hologram previews
+  blu3print.update-available-message:
+    default: op
+    description: Display a message on login when an update is available

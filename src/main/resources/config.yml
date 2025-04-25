@@ -20,4 +20,6 @@ blu3print:
       enabled: true
     discount-placement-message:
       enabled: true
+    update-available-message:
+      enabled: true
     

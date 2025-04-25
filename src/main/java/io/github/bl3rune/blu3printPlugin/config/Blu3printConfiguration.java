@@ -16,6 +16,8 @@ public class Blu3printConfiguration {
     private static boolean freePlacementMessageEnabled = false;
     private static boolean forcePlacementMessageEnabled = false;
     private static boolean discountPlacementMessageEnabled = false;
+    private static boolean updateAvailableMessageEnabled = false;
+
 
     public static void refreshConfiguration() {
         maxSize = tryAndGetConfig("blu3print.max-size");
@@ -28,6 +30,7 @@ public class Blu3printConfiguration {
         freePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.free-placement-message.enabled");
         forcePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.force-placement-message.enabled");
         discountPlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.discount-placement-message.enabled");
+        updateAvailableMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.update-available-message.enabled");
     }
 
     private static Integer tryAndGetConfig(String key) {
@@ -95,6 +98,10 @@ public class Blu3printConfiguration {
 
     public static boolean isDiscountPlacementMessageEnabled() {
         return discountPlacementMessageEnabled;
+    }
+
+    public static boolean isUpdateAvailableMessageEnabled() {
+        return updateAvailableMessageEnabled;
     }
 
 }

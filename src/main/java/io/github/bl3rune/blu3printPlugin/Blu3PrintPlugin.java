@@ -3,6 +3,10 @@ package io.github.bl3rune.blu3printPlugin;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,11 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
@@ -27,6 +36,7 @@ import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
 import io.github.bl3rune.blu3printPlugin.listeners.BookListener;
 import io.github.bl3rune.blu3printPlugin.listeners.MenuInteractListener;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
+import io.github.bl3rune.blu3printPlugin.listeners.PlayerJoinListener;
 
 /** 
  * The main class of the Blu3Print plugin
@@ -36,9 +46,14 @@ import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
 public final class Blu3PrintPlugin extends JavaPlugin {
 
     private static Blu3PrintPlugin instance;
+    private static List<String> updateMessages = new ArrayList<>();
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
+    }
+
+    public static List<String> getUpdateMessages() {
+        return updateMessages;
     }
     
     private HashMap<String, Blu3printData> cachedBlueprints = new HashMap<>();
@@ -48,6 +63,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         getLogger().info("Starting Blu3Print Plugin");
+        checkUpdate();
         instance = this;
         getConfig().options().copyDefaults();
         saveDefaultConfig();
@@ -59,6 +75,8 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
         getServer().getPluginManager().registerEvents(new MenuInteractListener(), this);
         getServer().getPluginManager().registerEvents(new BookListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+
 
         for (CommandType commandType : CommandType.values()) {
             getCommand(commandType.getFullCommandName()).setExecutor(commandType.getCommandExecutor());
@@ -68,6 +86,49 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         }
 
     }
+
+    public void checkUpdate() {
+        try {
+            HttpURLConnection con = (HttpURLConnection) new URL("https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases/latest").openConnection();
+            con.setDoOutput(true);
+            con.setRequestMethod("GET");
+            JsonReader reader = gson.newJsonReader(new InputStreamReader(con.getInputStream()));
+            JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+            String version = json.get("tag_name").getAsString();
+            if (!this.getDescription().getVersion().equals(version)) {
+                updateMessages = new ArrayList<>();
+                updateMessages.add("§9[Blu3Print]§r§6 New Update Available!");
+                updateMessages.add("§9[Blu3Print]§r Current v" + this.getDescription().getVersion() + " >> Latest v" + version);
+                updateMessages.addAll(getUpdateMessageDetails());
+                updateMessages.forEach(um -> Bukkit.getConsoleSender().sendMessage(um));
+            }
+        } catch (Exception ex) {
+            Bukkit.getConsoleSender().sendMessage("§cCould not check for Updates!");
+        }
+    }
+
+    public List<String> getUpdateMessageDetails() {
+        List<String> updateMessages = new ArrayList<>();
+        try {
+            HttpURLConnection con = (HttpURLConnection) new URL("https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases").openConnection();
+            con.setDoOutput(true);
+            con.setRequestMethod("GET");
+            JsonReader reader = gson.newJsonReader(new InputStreamReader(con.getInputStream()));
+            JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
+            for (JsonElement element : jsonArray.asList()) {
+                JsonObject release = element.getAsJsonObject();
+                String version = release.get("tag_name").getAsString();
+                if (this.getDescription().getVersion().equals(version)) break;
+                String update = release.get("name").getAsString();
+                updateMessages.add("§9[Blu3Print]§r " + update);
+            }
+        } catch (Exception ex) {
+            Bukkit.getConsoleSender().sendMessage("§cCould not check for detailed updates!");
+        }
+    
+        return updateMessages;
+    }
+
 
     @Override
     public void onDisable() {

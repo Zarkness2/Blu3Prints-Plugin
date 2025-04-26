@@ -85,14 +85,14 @@ permissions:
       blu3print.import: true
       blu3print.export: true
       blu3print.scale: true
+      blu3print.name: true
+      blu3print.help: true
+      blu3print.holograms: true
       blu3print.no-size-limit: true
       blu3print.no-scale-limit: true
       blu3print.force-place-discount: true
       blu3print.no-block-cost: true
-      blu3print.name: true
       blu3print.give: true
-      blu3print.help: true
-      blu3print.holograms: true
       blu3print.update-available-message: true
   blu3print.basics:
     description: Allowed to use Blu3Prints

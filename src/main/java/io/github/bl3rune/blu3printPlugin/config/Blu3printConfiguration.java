@@ -17,6 +17,7 @@ public class Blu3printConfiguration {
     private static boolean forcePlacementMessageEnabled = false;
     private static boolean discountPlacementMessageEnabled = false;
     private static boolean updateAvailableMessageEnabled = false;
+    private static boolean cooldownMessageEnabled = false;
 
 
     public static void refreshConfiguration() {
@@ -31,6 +32,7 @@ public class Blu3printConfiguration {
         forcePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.force-placement-message.enabled");
         discountPlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.discount-placement-message.enabled");
         updateAvailableMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.update-available-message.enabled");
+        cooldownMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.cooldown-message.enabled");
     }
 
     private static Integer tryAndGetConfig(String key) {
@@ -104,4 +106,7 @@ public class Blu3printConfiguration {
         return updateAvailableMessageEnabled;
     }
 
+    public static boolean isCooldownMessageEnabled() {
+        return cooldownMessageEnabled;
+    }
 }

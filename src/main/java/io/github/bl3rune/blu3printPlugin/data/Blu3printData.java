@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
+import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
@@ -392,7 +393,7 @@ public abstract class Blu3printData {
 
     protected void sendMessage(Player player, String message) {
         if (player == null) {
-            System.out.println(message);
+            Blu3PrintPlugin.logger().info(message);
         } else {
             player.sendMessage(message);
         }

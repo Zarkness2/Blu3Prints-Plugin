@@ -63,6 +63,9 @@ public class PlayerInteractListener implements Listener {
         long currentTime = System.currentTimeMillis();
         if (lastInteractionPerPlayer.getOrDefault(playerKey, currentTime - cooldown) + cooldown > currentTime) {
             event.setCancelled(true);
+            if (Blu3printConfiguration.isCooldownMessageEnabled() && player != null) {
+                player.sendMessage(ChatColor.RED + "Cooldown Triggered");
+            }
             return; // Whoa, Slow Down Maurice!
         }
         lastInteractionPerPlayer.put(playerKey, currentTime);

@@ -22,4 +22,6 @@ blu3print:
       enabled: true
     update-available-message:
       enabled: true
+    cooldown-message:
+      enabled: false
     

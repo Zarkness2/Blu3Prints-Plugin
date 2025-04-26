@@ -73,8 +73,6 @@ There are also a default restrictions on the maximum size/scale of a blu3print f
 ![Safety](/images/Safety.png "Safety")
 
 
-
-
 ## Help
 Players can use the `/blu3print.help` command to get help with usage in-game or [look at the wiki pages](https://github.com/bl3rune/Blu3Prints-Plugin/wiki)
 

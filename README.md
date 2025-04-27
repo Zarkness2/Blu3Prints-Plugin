@@ -4,12 +4,12 @@
 [![Build Status](https://github.com/bl3rune/Blu3Prints-Plugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/bl3rune/Blu3Prints-Plugin/actions)
 ![Minimum MC Version](https://img.shields.io/badge/Spigot_Versions-v1.18_--_v1.21.5-orange)
 
-![Banner](/images/Banner.png "Banner")
+![Banner](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/New-Banner.png "Banner")
 ### **A blueprint tool that allows players to capture/share/manipulate designs within Minecraft** 
 ### Blu3prints are placed using blocks in inventory in survival (or free in creative mode / with permissions)
 
 
-![usage!](/images/Blu3print.gif "Usage")
+![usage!](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Blu3print.gif "Usage")
 
 ## Video tutorials playlist
 [![Watch the video](https://img.youtube.com/vi/iNgYVwC9tRA/maxresdefault.jpg)](https://www.youtube.com/watch?v=iNgYVwC9tRA&list=PLAnUQqo3m_n1ULxKJXg3neW2GYDa3U3Sj)
@@ -61,7 +61,7 @@ While holding a completed Blu3print, you can interact by:
 ### Exporting & Importing
 ------
 Blu3prints can be exported by using a cartography table or by using the `blu3print.export` command whilst holding the blu3print item.
-![Export](/images/Export.png "Export")
+![Export](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Export.png "Export")
 This code can be shared to other players and even be used on other servers running this plugin, allowing you to preserve your creations across servers or even showcase them online (visualiser website in the pipeline!)
 To use the encoded blu3prints, simply run the command `/blu3print.import <name> <encoded-string>`
 
@@ -70,13 +70,13 @@ To use the encoded blu3prints, simply run the command `/blu3print.import <name> 
 By default all commands apart from `/blu3print.give` should be available for all non OP players.
 There are also a default restrictions on the maximum size/scale of a blu3print for safety reasons. This can be configured in the `config.yml` file. [See the wiki permissions page for how to get set up](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Permissions)
 
-![Safety](/images/Safety.png "Safety")
+![Safety](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Safety.png "Safety")
 
 
 ## Help
 Players can use the `/blu3print.help` command to get help with usage in-game or [look at the wiki pages](https://github.com/bl3rune/Blu3Prints-Plugin/wiki)
 
-![Help](/images/Help.png "Help")
+![Help](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Help.png "Help")
 
 
 ## Configuration
@@ -88,4 +88,4 @@ Configuration can be found in the `config.yml` file. [See the wiki configuration
 
 ## License
 This project is licensed under the MIT License; 
-see [MIT License](MIT.md) for details.
+see [MIT License](LICENSE) for details.

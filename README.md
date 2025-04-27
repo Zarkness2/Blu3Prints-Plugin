@@ -36,6 +36,7 @@
 - In-Game `/blu3print.help` command to guide new users
 
 ## Getting started
+[See the wiki getting started for detailed set up.](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Getting-Started)
 
 First start by crafting a Blu3print Writer in the crafting table using these materials in any configuration:
 
@@ -60,6 +61,8 @@ While holding a completed Blu3print, you can interact by:
 
 ### Exporting & Importing
 ------
+[See the wiki sharing Blu3prints pages for how to get set up.](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Sharing-Blu3prints-and-using-between-servers)
+
 Blu3prints can be exported by using a cartography table or by using the `blu3print.export` command whilst holding the blu3print item.
 ![Export](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Export.png "Export")
 This code can be shared to other players and even be used on other servers running this plugin, allowing you to preserve your creations across servers or even showcase them online (visualiser website in the pipeline!)
@@ -68,7 +71,9 @@ To use the encoded blu3prints, simply run the command `/blu3print.import <name> 
 
 ## Permissions
 By default all commands apart from `/blu3print.give` should be available for all non OP players.
-There are also a default restrictions on the maximum size/scale of a blu3print for safety reasons. This can be configured in the `config.yml` file. [See the wiki permissions page for how to get set up](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Permissions)
+There are also a default restrictions on the maximum size/scale of a blu3print for safety reasons. This can be configured in the `config.yml` file. 
+
+[See the wiki permissions page for how to get set up](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Permissions)
 
 ![Safety](https://github.com/bl3rune/Blu3Prints-Plugin/raw/main/images/Safety.png "Safety")
 
@@ -83,7 +88,9 @@ Players can use the `/blu3print.help` command to get help with usage in-game or 
 This plugin is fairly plug-and-play, simply place inside the `plugins` folder of your server and start 
 the server. 
 
-Configuration can be found in the `config.yml` file. [See the wiki configuration pages for how to get set up](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Configuration)
+Configuration can be found in the `config.yml` file.
+
+[See the wiki configuration pages for how to get set up](https://github.com/bl3rune/Blu3Prints-Plugin/wiki/Configuration)
 
 
 ## License

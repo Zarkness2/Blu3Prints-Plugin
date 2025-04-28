@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -11,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -20,6 +23,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 import io.github.bl3rune.blu3printPlugin.enums.Turn;
@@ -86,12 +90,15 @@ public abstract class Blu3printData {
     // PLACING BLU3PRINT SECTION
 
     public void placeBlocks(Player player, Location location, boolean forced, boolean onTop) {
-        Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(location, onTop);
+        Function<Location, Location> calculateFinalLocation = buildCalculateFinalLocationFunction(player, location,
+                onTop);
+        Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(calculateFinalLocation);
 
         Map<String, Integer> missingBlocks = checkPlayerHasBLocksInInventory(player, false, blocksUnableToPlace);
         if (!missingBlocks.isEmpty()) {
             sendMessage(player, ChatColor.RED + "Missing these blocks to place the blu3print:");
-            missingBlocks.forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k.replace("_", " ") + " : " + v));
+            missingBlocks
+                    .forEach((k, v) -> sendMessage(player, ChatColor.RED + " - " + k.replace("_", " ") + " : " + v));
             return;
         }
 
@@ -118,11 +125,8 @@ public abstract class Blu3printData {
                 continue;
             }
 
-            int x = location.getBlockX() + coords[2];
-            int y = location.getBlockY() + (onTop ? 1 : 0) + coords[1];
-            int z = location.getBlockZ() + coords[0];
-
-            Location placeLocation = new Location(location.getWorld(), x, y, z);
+            Location placeLocation = calculateFinalLocation
+                    .apply(new Location(location.getWorld(), coords[2], coords[1], coords[0]));
             Block block = placeLocation.getBlock();
             if (block != null && !isBlockIgnorable(block)) {
                 coords = position.next(true);
@@ -135,26 +139,117 @@ public abstract class Blu3printData {
 
     }
 
-    private boolean placeBlock(Location location, MaterialData materialData) {
+    public Function<Location, Location> buildCalculateFinalLocationFunction(Player player, Location location,
+            boolean onTop) {
+        final Alignment align = Blu3printConfiguration.getAlignment();
+        final boolean relative = Blu3printConfiguration.getRelativePlacement();
+        final BlockFace playerFacing = Orientation.getCartesianBlockFace(player.getFacing());
+        Double x = location.getX();
+        Double y = location.getY() + (onTop ? 1 : 0);
+        Double z = location.getZ();
+        double xSize = position.getXSize();
+        double xSizeScaled = xSize * position.getScale(); 
 
-        World world = Bukkit.getWorld(location.getWorld().getName());
-        if (world == null) {
-            logger().info("World not found: " + location.getWorld().getName());
-            return false;
-        }
-
-        world.setType(location, materialData.getMaterial());
-        String complexData = materialData.getComplexData();
-        if (complexData != null) {
-            try {
-                BlockData blockData = Bukkit.createBlockData(complexData);
-                world.setBlockData(location, blockData);
-            } catch (Exception e) {
-                /* Tried to apply invalid block data */
-                // e.printStackTrace();
+        if (relative) {
+            switch (playerFacing) {
+                case NORTH:
+                    if (xSize > 1 && align == Alignment.RIGHT) {
+                        x = x + xSizeScaled;
+                    } else if (xSize > 1 && align == Alignment.CENTER) {
+                        x = x + (xSizeScaled / 2);
+                    }
+                    break;
+                case EAST:
+                    if (xSize > 1 && align == Alignment.LEFT) {
+                        z = z + xSizeScaled;
+                    } else if (xSize > 1 && align == Alignment.CENTER) {
+                        z = z + (xSizeScaled / 2);
+                    }
+                    break;
+                case SOUTH:
+                default:
+                    if (xSize > 1 && align == Alignment.LEFT) {
+                        x = x - xSizeScaled;
+                    } else if (xSize > 1 && align == Alignment.CENTER) {
+                        x = x - (xSizeScaled / 2);
+                    }
+                    break;
+                case WEST:
+                    if (xSize > 1 && align == Alignment.LEFT) {
+                        z = z -  xSizeScaled;
+                    } else if (xSize > 1 && align == Alignment.CENTER) {
+                        z = z - (xSizeScaled / 2);
+                    }
+            }
+        } else { // NON RELATIVE IS ALWAYS FROM PLAYER LOOKING SOUTH WITH RIGHT ALIGNMENT AS
+                 // DEFAULT
+            if (xSize > 1 && align == Alignment.LEFT) {
+                x = x - xSizeScaled;
+            } else if (xSize > 1 && align == Alignment.CENTER) {
+                x = x - (xSizeScaled / 2);
             }
         }
-        return true;
+
+        final double xx = x.doubleValue();
+        final double yy = y.doubleValue();
+        final double zz = z.doubleValue();
+
+        return (Location coords) -> {
+            Double cx = coords.getX();
+            Double cy = coords.getY() + yy;
+            Double cz = coords.getZ();
+
+            if (relative) {
+                switch (playerFacing) {
+                    case NORTH:
+                        cx = xx - cx - 0.5;
+                        cz = zz - cz;
+                        break;
+                    case EAST:
+                        double ex = xx + cz;
+                        double ez = zz - cx - 0.5;
+                        cx = ex;
+                        cz = ez;
+                        break;
+                    case SOUTH:
+                    default:
+                        cx = xx + cx;
+                        cz = zz + cz;
+                        break;
+                    case WEST:
+                        double wx = xx - cz;
+                        double wz = zz + cx;
+                        cx = wx;
+                        cz = wz;
+                }
+            } else { // PLAYER FACING SOUTH DEFAULT
+                cx = xx + cx;
+                cz = zz + cz;
+            }
+
+            return new Location(location.getWorld(), cx.intValue(), cy.intValue(), cz.intValue());
+        };
+    }
+
+    private Map<String, Integer> checkSpaceIsClear(Function<Location, Location> calculateFinalLocation) {
+        int scale = position.getScale();
+        int[] coords = position.next(true);
+        Map<String, Integer> blocksUnableToPlace = new HashMap<>();
+        while (coords != null) {
+            MaterialData materialData = this.selectionGrid[coords[0] / scale][coords[1] / scale][coords[2] / scale];
+            if (materialData == null || materialData.getName() == null) {
+                coords = position.next(true);
+                continue;
+            }
+            Location loc = calculateFinalLocation.apply(new Location(null, coords[2], coords[1], coords[0]));
+            Block block = loc.getBlock();
+            if (block != null && !isBlockIgnorable(block)) {
+                Integer count = blocksUnableToPlace.getOrDefault(materialData.getMaterial().name(), 0);
+                blocksUnableToPlace.put(materialData.getMaterial().name(), count + 1);
+            }
+            coords = position.next(true);
+        }
+        return blocksUnableToPlace;
     }
 
     private Map<String, Integer> checkPlayerHasBLocksInInventory(Player player, boolean removeBlocks,
@@ -289,28 +384,26 @@ public abstract class Blu3printData {
         return ingCountCopy;
     }
 
-    private Map<String, Integer> checkSpaceIsClear(Location location, boolean onTop) {
+    private boolean placeBlock(Location location, MaterialData materialData) {
+
         World world = Bukkit.getWorld(location.getWorld().getName());
-        int x = location.getBlockX();
-        int y = location.getBlockY() + (onTop ? 1 : 0);
-        int z = location.getBlockZ();
-        int scale = position.getScale();
-        int[] coords = position.next(true);
-        Map<String, Integer> blocksUnableToPlace = new HashMap<>();
-        while (coords != null) {
-            MaterialData materialData = this.selectionGrid[coords[0] / scale][coords[1] / scale][coords[2] / scale];
-            if (materialData == null || materialData.getName() == null) {
-                coords = position.next(true);
-                continue;
-            }
-            Block block = world.getBlockAt(x + coords[2], y + coords[1], z + coords[0]);
-            if (block != null && !isBlockIgnorable(block)) {
-                Integer count = blocksUnableToPlace.getOrDefault(materialData.getMaterial().name(), 0);
-                blocksUnableToPlace.put(materialData.getMaterial().name(), count + 1);
-            }
-            coords = position.next(true);
+        if (world == null) {
+            logger().info("World not found: " + location.getWorld().getName());
+            return false;
         }
-        return blocksUnableToPlace;
+
+        world.setType(location, materialData.getMaterial());
+        String complexData = materialData.getComplexData();
+        if (complexData != null) {
+            try {
+                BlockData blockData = Bukkit.createBlockData(complexData);
+                world.setBlockData(location, blockData);
+            } catch (Exception e) {
+                /* Tried to apply invalid block data */
+                // e.printStackTrace();
+            }
+        }
+        return true;
     }
 
     // EDITING BLU3PRINT SECTION

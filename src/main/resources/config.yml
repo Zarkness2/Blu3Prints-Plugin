@@ -13,6 +13,9 @@ blu3print:
     - AIR
     - WATER
     - LAVA
+  placement:
+    alignment: center # left / center / right
+    relative: true  # true / false  -  should place from direction player facing
   messaging: # Fine tune messaging for the Blu3Print plugin
     free-placement-message:
       enabled: true

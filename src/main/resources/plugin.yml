@@ -1,17 +1,17 @@
 name: Blu3PrintPlugin
-version: '1.4.3'
+version: '1.5.0'
 main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
 api-version: '1.18'
 prefix: Blu3Print
 authors: [ bl3rune ]
-description: A blueprint tool that allows players to capture/share/manipulate designs within Minecraft
+description: A dynamic blueprint tool that allows players to capture/build/share/edit/preview designs
 website: https://github.com/bl3rune/Blu3Prints-Plugin
 commands:
   blu3print:
-    description: Blu3PrintPlugin usage
+    description: Blu3printPlugin menu usage
     usage: /<command>
     permission: blu3print
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to use the Blu3print menu
     aliases: [ blu3 ]
   blu3print.duplicate:
     description: Duplicate the Blu3Print currently held (If a blank Blu3Print is in inventory)

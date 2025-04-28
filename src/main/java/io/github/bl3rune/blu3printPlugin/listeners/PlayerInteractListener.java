@@ -202,7 +202,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         Location startLocation = block.getLocation();
-        Hologram hologram = new Hologram(startLocation, blu3printData);
+        Hologram hologram = new Hologram(player, startLocation, blu3printData);
         hologram.placeHologram();
     }
 

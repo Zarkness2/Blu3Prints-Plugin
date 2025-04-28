@@ -178,7 +178,9 @@ public final class Blu3PrintPlugin extends JavaPlugin {
                 map.put(entry.getKey(), data);
             }
             getLogger().warning("Loaded Cached blu3prints from blu3prints.json");
-            map.forEach((k,v) -> getLogger().info(k + " : " + v.getEncodedString()));
+            if (Blu3printConfiguration.isImportedBlu3printsLoggingEnabled()) {
+                map.forEach((k,v) -> getLogger().info(k + " : " + v.getEncodedString()));
+            }
             cachedBlueprints = map;
 
         } catch (Exception e) {

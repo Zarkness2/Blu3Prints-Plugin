@@ -27,4 +27,9 @@ blu3print:
       enabled: true
     cooldown-message:
       enabled: false
+  logging: # Fine tune logging for the Blu3Print plugin
+    verbose: false # Enable verbose logging
+    imported-blu3prints: # Log all imported blu3prints
+      enabled: true
+    
     

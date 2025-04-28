@@ -74,16 +74,20 @@ public class Hologram {
 
     private void buildArmourStand(Location l, MaterialData data) {
         // Implementation of building an armour stand
-        ArmorStand armorStand = (ArmorStand) l.getWorld().spawnEntity(l, EntityType.ARMOR_STAND);
-        armorStand.setVisible(false);
-        armorStand.setGravity(false);
-        armorStand.setCollidable(false);
-        armorStand.teleport(new Location(l.getWorld(), l.getX(), l.getY() - 1.25, l.getZ()));
-
-        ItemStack item = new ItemStack(data.getMaterial());
-        EntityEquipment equipment = armorStand.getEquipment();
-        equipment.setHelmet(item);
-
+        ArmorStand armorStand = (ArmorStand) l.getWorld().spawn(l, ArmorStand.class, (ArmorStand a) -> {
+            a.setVisible(false);
+            a.setGravity(false);
+            a.setCollidable(false);
+            a.setArms(false);
+            a.setBasePlate(false);
+            a.setCanPickupItems(false);
+            a.setMarker(true);
+            a.setPersistent(false);
+            a.setRemoveWhenFarAway(true);
+            a.setSmall(true);
+            a.getEquipment().setHelmet(new ItemStack(data.getMaterial()));
+            a.teleport(new Location(l.getWorld(), l.getX(), l.getY() - 0.5, l.getZ()));
+        });
         this.holograms.add(armorStand);
     }
 

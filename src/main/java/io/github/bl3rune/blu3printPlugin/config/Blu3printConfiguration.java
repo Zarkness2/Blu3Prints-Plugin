@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
+import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 
 public class Blu3printConfiguration {
     
@@ -13,6 +14,10 @@ public class Blu3printConfiguration {
     private static Integer cooldown = null;
     private static Integer hologramTtl = null;
     private static List<String> ignoredMaterials;
+    // Placement
+    private static Alignment alignment = null;
+    private static boolean relativePlacement = false;
+    // Messages
     private static boolean freePlacementMessageEnabled = false;
     private static boolean forcePlacementMessageEnabled = false;
     private static boolean discountPlacementMessageEnabled = false;
@@ -27,6 +32,9 @@ public class Blu3printConfiguration {
         cooldown = tryAndGetConfig("blu3print.cooldown");
         hologramTtl = tryAndGetConfig("blu3print.hologram-ttl");
         ignoredMaterials = tryAndGetConfigList("blu3print.ignored-materials");
+        // Placement settings
+        alignment = tryAndGetConfigEnum("blu3print.placement.alignment", Alignment.class);
+        relativePlacement = tryAndGetConfigFlag("blu3print.placement.relative");
         // Message settings
         freePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.free-placement-message.enabled");
         forcePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.force-placement-message.enabled");
@@ -40,6 +48,26 @@ public class Blu3printConfiguration {
             String value = Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString(key, null);
             return value == null ? null : Integer.parseInt(value);
         } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static <T extends Enum<T>> T tryAndGetConfigEnum(String key, Class<T> clazz) {
+        try {
+            if (clazz.isEnum()) {
+                String value = Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString(key, null);
+                System.out.println("Config check : " + clazz.getName() + " : " + value);
+                for  (T e : clazz.getEnumConstants()) {
+                    if (e.name().equalsIgnoreCase(value)) {
+                        System.out.println("Found : " + clazz.getName() + " : " + e.name());
+                        return e;
+                    }
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            System.out.println("Failed to get Enum " + clazz.getName());
+            e.printStackTrace();
             return null;
         }
     }
@@ -88,6 +116,17 @@ public class Blu3printConfiguration {
 
     public static List<String> getIgnoredMaterials() {
         return ignoredMaterials;
+    }
+
+    public static Alignment getAlignment() {
+        if (alignment == null) {
+            return Alignment.CENTER;
+        }
+        return alignment;
+    }
+
+    public static boolean getRelativePlacement() {
+        return relativePlacement;
     }
 
     public static boolean isFreePlacementMessageEnabled() {

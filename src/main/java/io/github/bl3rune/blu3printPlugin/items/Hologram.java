@@ -2,11 +2,13 @@ package io.github.bl3rune.blu3printPlugin.items;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,12 +25,15 @@ public class Hologram {
     private ManipulatablePosition position;
     private String uuid;
     private List<ArmorStand> holograms; // List to hold the holograms
+    private Function<Location,Location> calculateFinalLocationFunction;
 
-    public Hologram(Location startLocation, Blu3printData data) {
-        this.location = startLocation;
+
+    public Hologram(Player player, Location startLocation, Blu3printData data) {
+        this.location = new Location(startLocation.getWorld(), startLocation.getX(), startLocation.getY(), startLocation.getZ());
         this.selectionGrid = data.getSelectionGrid().clone();
         this.position = new ManipulatablePosition(data.getPosition(), data.getPosition().getScale());
         this.holograms = new ArrayList<>(); // Initialize the list of holograms
+        calculateFinalLocationFunction = data.buildCalculateFinalLocationFunction(player, startLocation, true);
     }
 
     public String getUUID() {
@@ -47,12 +52,8 @@ public class Hologram {
                 coords = position.next(true);
                 continue;
             }
-
-            double x = location.getX() + coords[2] + 0.5;
-            double y = location.getY() + coords[1] + 1.0;
-            double z = location.getZ() + coords[0] + 0.5;
-
-            Location placeLocation = new Location(location.getWorld(), x, y, z);
+            Location loc = calculateFinalLocationFunction.apply(new Location(location.getWorld(), coords[2], coords[1], coords[0]));
+            Location placeLocation = new Location(loc.getWorld(), loc.getX() + 0.5, loc.getY() + 0.1, loc.getZ() + 0.5);
             Block block = placeLocation.getBlock();
             if (block != null && !isBlockIgnorable(block)) {
                 coords = position.next(true);

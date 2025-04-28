@@ -5,6 +5,9 @@ import java.util.List;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.enums.Alignment;
+import io.github.bl3rune.blu3printPlugin.enums.SemanticLevel;
+
+import static io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin.logger;
 
 public class Blu3printConfiguration {
     
@@ -23,14 +26,21 @@ public class Blu3printConfiguration {
     private static boolean discountPlacementMessageEnabled = false;
     private static boolean updateAvailableMessageEnabled = false;
     private static boolean cooldownMessageEnabled = false;
-
+    // Logging
+    private static boolean verboseLogging = false;
+    private static boolean importedBlu3printsLoggingEnabled = false;
+    private static SemanticLevel updateLoggingLevel = SemanticLevel.MINOR;
+    // Other
+    private static Integer updateCheckInterval = null;
 
     public static void refreshConfiguration() {
-        maxSize = tryAndGetConfig("blu3print.max-size");
-        maxScale = tryAndGetConfig("blu3print.max-scale");
-        maxOverallSize = tryAndGetConfig("blu3print.max-overall-size");
-        cooldown = tryAndGetConfig("blu3print.cooldown");
-        hologramTtl = tryAndGetConfig("blu3print.hologram-ttl");
+        verboseLogging = tryAndGetConfigFlag("blu3print.logging.verbose");
+
+        maxSize = tryAndGetConfigInteger("blu3print.max-size");
+        maxScale = tryAndGetConfigInteger("blu3print.max-scale");
+        maxOverallSize = tryAndGetConfigInteger("blu3print.max-overall-size");
+        cooldown = tryAndGetConfigInteger("blu3print.cooldown");
+        hologramTtl = tryAndGetConfigInteger("blu3print.hologram-ttl");
         ignoredMaterials = tryAndGetConfigList("blu3print.ignored-materials");
         // Placement settings
         alignment = tryAndGetConfigEnum("blu3print.placement.alignment", Alignment.class);
@@ -41,9 +51,17 @@ public class Blu3printConfiguration {
         discountPlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.discount-placement-message.enabled");
         updateAvailableMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.update-available-message.enabled");
         cooldownMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.cooldown-message.enabled");
+        // Logging settings
+        importedBlu3printsLoggingEnabled = tryAndGetConfigFlag("blu3print.logging.imported-blu3prints.enabled");
+        updateLoggingLevel = tryAndGetConfigEnum("blu3print.logging.update-level", SemanticLevel.class);
+
+        // Other settings
+        updateCheckInterval = tryAndGetConfigInteger("blu3print.update-check-interval");
+
+
     }
 
-    private static Integer tryAndGetConfig(String key) {
+    private static Integer tryAndGetConfigInteger(String key) {
         try {
             String value = Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString(key, null);
             return value == null ? null : Integer.parseInt(value);
@@ -56,18 +74,24 @@ public class Blu3printConfiguration {
         try {
             if (clazz.isEnum()) {
                 String value = Blu3PrintPlugin.getBlu3PrintPlugin().getConfig().getString(key, null);
-                System.out.println("Config check : " + clazz.getName() + " : " + value);
+                if (isVerboseLogging()) {
+                    logger().info("Config check : " + clazz.getName() + " : " + value);
+                }
                 for  (T e : clazz.getEnumConstants()) {
                     if (e.name().equalsIgnoreCase(value)) {
-                        System.out.println("Found : " + clazz.getName() + " : " + e.name());
+                        if (isVerboseLogging()) {
+                            logger().info("Found : " + clazz.getName() + " : " + e.name());
+                        }
                         return e;
                     }
                 }
             }
             return null;
         } catch (Exception e) {
-            System.out.println("Failed to get Enum " + clazz.getName());
-            e.printStackTrace();
+            logger().info("Failed to get Enum " + clazz.getName());
+            if (isVerboseLogging()) {
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -147,5 +171,24 @@ public class Blu3printConfiguration {
 
     public static boolean isCooldownMessageEnabled() {
         return cooldownMessageEnabled;
+    }
+
+    public static boolean isVerboseLogging() {
+        return verboseLogging;
+    }
+
+    public static boolean isImportedBlu3printsLoggingEnabled() {
+        return importedBlu3printsLoggingEnabled;
+    }
+
+    public static SemanticLevel getUpdateLoggingLevel() {
+        return updateLoggingLevel;
+    }
+
+    public static int getUpdateCheckInterval() {
+        if (updateCheckInterval == null) {
+            return 24;
+        }
+        return updateCheckInterval;
     }
 }

@@ -27,4 +27,10 @@ blu3print:
       enabled: true
     cooldown-message:
       enabled: false
+  logging: # Fine tune logging for the Blu3Print plugin
+    verbose: false # Enable verbose logging
+    imported-blu3prints: # Log all imported blu3prints
+      enabled: false
+    update-level: PATCH # MAJOR / MINOR / PATCH / NONE  -  minimum level of updates to log
+  update-check-interval: 24 # Check for updates every X hours
     

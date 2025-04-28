@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -32,13 +33,14 @@ import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
+import io.github.bl3rune.blu3printPlugin.enums.SemanticLevel;
 import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
 import io.github.bl3rune.blu3printPlugin.listeners.BookListener;
 import io.github.bl3rune.blu3printPlugin.listeners.MenuInteractListener;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerJoinListener;
 
-/** 
+/**
  * The main class of the Blu3Print plugin
  * 
  * @author bl3rune
@@ -55,7 +57,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     public static List<String> getUpdateMessages() {
         return updateMessages;
     }
-    
+
     private HashMap<String, Blu3printData> cachedBlueprints = new HashMap<>();
     private Gson gson = new Gson();
 
@@ -77,7 +79,6 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BookListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
-
         for (CommandType commandType : CommandType.values()) {
             getCommand(commandType.getFullCommandName()).setExecutor(commandType.getCommandExecutor());
             if (commandType.getTabCompleter() != null) {
@@ -85,20 +86,46 @@ public final class Blu3PrintPlugin extends JavaPlugin {
             }
         }
 
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                checkUpdate();
+            }
+        }.runTaskTimer(this, 0, (60 * 60 * 20 * Blu3printConfiguration.getUpdateCheckInterval())); // Run every X hours
+
     }
 
     public void checkUpdate() {
         try {
-            HttpURLConnection con = (HttpURLConnection) new URL("https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases/latest").openConnection();
+            SemanticLevel semanticLevel = Blu3printConfiguration.getUpdateLoggingLevel();
+            if (semanticLevel == SemanticLevel.NONE) {
+                return;
+            }
+
+            HttpURLConnection con = (HttpURLConnection) new URL(
+                    "https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases/latest").openConnection();
             con.setDoOutput(true);
             con.setRequestMethod("GET");
             JsonReader reader = gson.newJsonReader(new InputStreamReader(con.getInputStream()));
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-            String version = json.get("tag_name").getAsString();
-            if (!this.getDescription().getVersion().equals(version)) {
+            String latestVersion = json.get("tag_name").getAsString();
+            String version = this.getDescription().getVersion();
+            String[] lv = latestVersion.split("\\.");
+            String[] v = version.split("\\.");
+            boolean changed = lv.length != v.length;
+            switch (semanticLevel) {
+                case PATCH:
+                    changed = changed || (!lv[2].equals(v[2]));
+                case MINOR:
+                    changed = changed || (!lv[1].equals(v[1]));
+                case MAJOR:
+                    changed = changed || (!lv[0].equals(v[0]));
+                default:
+            }
+            if (changed) {
                 updateMessages = new ArrayList<>();
                 updateMessages.add("§9[Blu3Print]§r§6 New Update Available!");
-                updateMessages.add("§9[Blu3Print]§r Current v" + this.getDescription().getVersion() + " >> Latest v" + version);
+                updateMessages.add("§9[Blu3Print]§r Current v" + version + " >> Latest v" + latestVersion);
                 updateMessages.addAll(getUpdateMessageDetails());
                 updateMessages.forEach(um -> Bukkit.getConsoleSender().sendMessage(um));
             }
@@ -108,27 +135,43 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     }
 
     public List<String> getUpdateMessageDetails() {
+        SemanticLevel semanticLevel = Blu3printConfiguration.getUpdateLoggingLevel();
+        String version = this.getDescription().getVersion();
+        String[] v = version.split("\\.");
         List<String> updateMessages = new ArrayList<>();
         try {
-            HttpURLConnection con = (HttpURLConnection) new URL("https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases").openConnection();
+            HttpURLConnection con = (HttpURLConnection) new URL(
+                    "https://api.github.com/repos/bl3rune/Blu3Prints-Plugin/releases").openConnection();
             con.setDoOutput(true);
             con.setRequestMethod("GET");
             JsonReader reader = gson.newJsonReader(new InputStreamReader(con.getInputStream()));
             JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
             for (JsonElement element : jsonArray.asList()) {
                 JsonObject release = element.getAsJsonObject();
-                String version = release.get("tag_name").getAsString();
-                if (this.getDescription().getVersion().equals(version)) break;
+                String releaseVersion = release.get("tag_name").getAsString();
+                String[] rv = releaseVersion.split("\\.");
+                boolean changed = rv.length != v.length;
+                switch (semanticLevel) {
+                    case PATCH:
+                        changed = changed || (!rv[2].equals(v[2]));
+                    case MINOR:
+                        changed = changed || (!rv[1].equals(v[1]));
+                    case MAJOR:
+                        changed = changed || (!rv[0].equals(v[0]));
+                    default:
+                }
+                if (!changed) {
+                    break;
+                }
                 String update = release.get("name").getAsString();
                 updateMessages.add("§9[Blu3Print]§r " + update);
             }
         } catch (Exception ex) {
             Bukkit.getConsoleSender().sendMessage("§cCould not check for detailed updates!");
         }
-    
+
         return updateMessages;
     }
-
 
     @Override
     public void onDisable() {
@@ -138,8 +181,9 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     }
 
     private void addBlu3printRecipes() {
-        
-        ShapelessRecipe recipe = new ShapelessRecipe(new NamespacedKey(this, "Blu3print_Writer"), Blu3printItem.getBlankBlu3print());
+
+        ShapelessRecipe recipe = new ShapelessRecipe(new NamespacedKey(this, "Blu3print_Writer"),
+                Blu3printItem.getBlankBlu3print());
         recipe.setGroup("Tools & Utilities");
         List<String> ingredients = getConfig().getStringList("blu3print.recipe.ingredients");
 
@@ -150,7 +194,8 @@ public final class Blu3PrintPlugin extends JavaPlugin {
             Bukkit.addRecipe(recipe);
         } catch (Exception e) {
             getLogger().warning("Invalid blu3print recipe. using default recipe");
-            ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(this, "Blu3print_Writer"), Blu3printItem.getBlankBlu3print());
+            ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(this, "Blu3print_Writer"),
+                    Blu3printItem.getBlankBlu3print());
             shapelessRecipe.addIngredient(Material.PAPER);
             shapelessRecipe.addIngredient(Material.LAPIS_LAZULI);
             shapelessRecipe.addIngredient(Material.FEATHER);
@@ -162,10 +207,10 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     private void loadSavedBlueprintsToCache() {
         try {
             File file = new File(getDataFolder().getAbsolutePath() + File.separator + "blu3prints.json");
-            if (!file.exists()) { 
+            if (!file.exists()) {
                 return;
             }
-            
+
             FileReader reader = new FileReader(file);
             Map<String, String> entries = gson.fromJson(reader, Map.class);
             if (entries == null || entries.isEmpty()) {
@@ -173,22 +218,24 @@ public final class Blu3PrintPlugin extends JavaPlugin {
                 return;
             }
             HashMap<String, Blu3printData> map = new HashMap<>();
-            for  (Entry<String, String> entry  : entries.entrySet())  {
+            for (Entry<String, String> entry : entries.entrySet()) {
                 Blu3printData data = new ImportedBlu3printData(null, entry.getValue());
                 map.put(entry.getKey(), data);
             }
             getLogger().warning("Loaded Cached blu3prints from blu3prints.json");
-            map.forEach((k,v) -> getLogger().info(k + " : " + v.getEncodedString()));
+            if (Blu3printConfiguration.isImportedBlu3printsLoggingEnabled()) {
+                map.forEach((k, v) -> getLogger().info(k + " : " + v.getEncodedString()));
+            }
             cachedBlueprints = map;
 
         } catch (Exception e) {
             getLogger().severe("Failed to load blu3prints to cache : " + e.getMessage());
             e.printStackTrace();
         }
-    
+
     }
 
-    public synchronized void saveCachedBlu3prints()  {
+    public synchronized void saveCachedBlu3prints() {
         try {
             File file = new File(getDataFolder().getAbsolutePath() + File.separator + "blu3prints.json");
             file.getParentFile().mkdir();
@@ -209,26 +256,25 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         }
     }
 
-    public Blu3printData getBlu3printFrpmCache(ItemStack blu3print, Player player)   {
+    public Blu3printData getBlu3printFrpmCache(ItemStack blu3print, Player player) {
         String key = Blu3printItem.extractCacheKeyFromBlu3print(blu3print);
         if (key == null) {
             logger().warning("Blu3print ID is missing from the server cache");
             player.sendMessage("Blu3print ID is missing from the server cache");
-        } 
+        }
         return getBlu3printFrpmCache(key);
     }
 
-    public Blu3printData getBlu3printFrpmCache(String key)  {
+    public Blu3printData getBlu3printFrpmCache(String key) {
         return cachedBlueprints.getOrDefault(key, null);
     }
 
     public String getKeyFromEncoding(String encoded) {
-        return cachedBlueprints.entrySet().stream().filter(e ->
-            e.getValue().getEncodedString().equals(encoded)
-        ).map(e -> e.getKey()).findFirst().orElse(null);
+        return cachedBlueprints.entrySet().stream().filter(e -> e.getValue().getEncodedString().equals(encoded))
+                .map(e -> e.getKey()).findFirst().orElse(null);
     }
-    
-    public synchronized void saveOrUpdateCachedBlu3print(String key, Blu3printData data)  {
+
+    public synchronized void saveOrUpdateCachedBlu3print(String key, Blu3printData data) {
         cachedBlueprints.put(key, data);
         if (Blu3PrintPlugin.getBlu3PrintPlugin() != null) {
             Blu3PrintPlugin.getBlu3PrintPlugin().saveCachedBlu3prints();

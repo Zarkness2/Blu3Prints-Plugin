@@ -31,8 +31,11 @@ public class HelpCommand implements CommandExecutor {
                     case "commands":
                         commandsHelp(player);
                         break;
+                    case "config":
+                        configHelp(player);
+                        break;
                     default:
-                        player.sendMessage(ChatColor.RED + "Invalid command. Try " + wrapCommand("/blu3print.help writer/usage/table/commands"));
+                        player.sendMessage(ChatColor.RED + "Invalid command. Try \n" + wrapCommand("/blu3print.help writer/usage/table/commands/config"));
                         break;
                 }
                 return true;
@@ -48,7 +51,8 @@ public class HelpCommand implements CommandExecutor {
             player.sendMessage(ChatColor.GRAY + "For information on how to use a Blu3print Writer use the help command again like this: " + wrapCommand("/blu3print.help writer"));
             player.sendMessage(ChatColor.GRAY + "For information on how to use a finished Blu3print use the help command again like this: " + wrapCommand("/blu3print.help usage"));
             player.sendMessage(ChatColor.GRAY + "For information on how to use a Blu3print with the cartography table use the help command again like this: " + wrapCommand("/blu3print.help table"));
-            player.sendMessage(ChatColor.GRAY + "For information on how to use a Blu3print commands use the help command again like this: " + wrapCommand("/blu3print.help commands"));
+            player.sendMessage(ChatColor.GRAY + "For information on how to use Blu3print commands use the help command again like this: " + wrapCommand("/blu3print.help commands"));
+            player.sendMessage(ChatColor.GRAY + "For information on how to use Blu3print config command use the help command again like this: " + wrapCommand("/blu3print.help config"));
         }
 
         return true;
@@ -98,6 +102,17 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.scale") + " to change the scale of the blu3print");
         player.sendMessage(ChatColor.WHITE + "While holding a Blu3print Writer:");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.import <name> <encoding>") + " to import a blu3print from text");
+    }
+
+    private void configHelp(Player player) {
+        player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "##### Blu3Print Config Command Help #####");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config") + " to set player blu3print config");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config CLEAR") + " to clear player blu3print config");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_XYZ 0-2 0 0-1") + " to set hologram for current blu3print to only show blocks in layers X 0,1,2 and Y 0 and Z 0,1");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_X 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the X layers 0,2,3,5,6,7");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_Y 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the Y layers 0,2,3,5,6,7");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_Z 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the Z layers 0,2,3,5,6,7");
+
     }
 
     private String wrapCommand(String command) {

@@ -30,6 +30,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfiguration;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
@@ -47,8 +48,10 @@ import io.github.bl3rune.blu3printPlugin.listeners.PlayerJoinListener;
  */
 public final class Blu3PrintPlugin extends JavaPlugin {
 
+    // Static Fields
     private static Blu3PrintPlugin instance;
     private static List<String> updateMessages = new ArrayList<>();
+    private static Map<String,PerPlayerBlu3printConfiguration> playerConfig = new HashMap<>(); // Clears on server restart
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
@@ -58,6 +61,23 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         return updateMessages;
     }
 
+    public static PerPlayerBlu3printConfiguration getPerPlayerBlu3printConfiguration(String playerUUID) {
+        return playerConfig.getOrDefault(playerUUID, null);
+    }
+
+    public static void setPerPlayerBlu3printConfiguration(String playerUUID, PerPlayerBlu3printConfiguration ppbc) {
+        if (ppbc == null) {
+            playerConfig.remove(playerUUID);
+        } else {
+            playerConfig.put(playerUUID, ppbc);
+        }
+    }
+
+    public static Logger logger() {
+        return instance.getLogger();
+    }
+
+    // Non-static
     private HashMap<String, Blu3printData> cachedBlueprints = new HashMap<>();
     private Gson gson = new Gson();
 
@@ -279,10 +299,6 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         if (Blu3PrintPlugin.getBlu3PrintPlugin() != null) {
             Blu3PrintPlugin.getBlu3PrintPlugin().saveCachedBlu3prints();
         }
-    }
-
-    public static Logger logger() {
-        return instance.getLogger();
     }
 
 }

@@ -4,6 +4,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 
 import io.github.bl3rune.blu3printPlugin.commands.Blu3printCommand;
+import io.github.bl3rune.blu3printPlugin.commands.ConfigCommand;
+import io.github.bl3rune.blu3printPlugin.commands.ConfigTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.FaceCommand;
 import io.github.bl3rune.blu3printPlugin.commands.FaceTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.ScaleCommand;
@@ -33,7 +35,8 @@ public enum CommandType {
     SCALE("scale", new ScaleCommand()),
     NAME("name", new NameCommand()),
     GIVE("give", new GiveCommand()),
-    HELP("help", new HelpCommand());
+    HELP("help", new HelpCommand()),
+    CONFIG("config", new ConfigCommand(), new ConfigTabCompleter())
     ;
 
     private final String commandString;

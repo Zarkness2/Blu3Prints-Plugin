@@ -1,11 +1,11 @@
 package io.github.bl3rune.blu3printPlugin.config;
 
-public class PerPlayerBlu3printConfiguration {
+public class PerPlayerBlu3printConfig {
 
     private String uuid; // Blu3print to apply config to
     private int [] [] hologramViewLayers; // X[], Y[], Z[]
 
-    public PerPlayerBlu3printConfiguration(String uuid) {
+    public PerPlayerBlu3printConfig(String uuid) {
         this.uuid = uuid;
         this.hologramViewLayers = null;
     }

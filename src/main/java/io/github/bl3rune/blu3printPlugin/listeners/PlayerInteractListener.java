@@ -22,7 +22,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
 import io.github.bl3rune.blu3printPlugin.items.Blu3printItem;
@@ -58,12 +58,12 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        Integer cooldown = Blu3printConfiguration.getCooldown();
+        Integer cooldown = GlobalConfig.getCooldown();
         String playerKey = player.getUniqueId().toString();
         long currentTime = System.currentTimeMillis();
         if (lastInteractionPerPlayer.getOrDefault(playerKey, currentTime - cooldown) + cooldown > currentTime) {
             event.setCancelled(true);
-            if (Blu3printConfiguration.isCooldownMessageEnabled() && player != null) {
+            if (GlobalConfig.isCooldownMessageEnabled() && player != null) {
                 player.sendMessage(ChatColor.RED + "Cooldown Triggered");
             }
             return; // Whoa, Slow Down Maurice!

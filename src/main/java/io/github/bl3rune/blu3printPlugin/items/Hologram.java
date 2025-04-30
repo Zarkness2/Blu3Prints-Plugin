@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
-import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
+import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ManipulatablePosition;
 import io.github.bl3rune.blu3printPlugin.data.MaterialData;
@@ -26,7 +26,7 @@ public class Hologram {
     private ManipulatablePosition position;
     private List<ArmorStand> holograms; // List to hold the holograms
     private Function<Location,Location> calculateFinalLocationFunction;
-    private PerPlayerBlu3printConfiguration config;
+    private PerPlayerBlu3printConfig config;
 
 
     public Hologram(Player player, Location startLocation, Blu3printData data, String blu3printUuid) {
@@ -35,11 +35,11 @@ public class Hologram {
         this.position = new ManipulatablePosition(data.getPosition(), data.getPosition().getScale());
         this.holograms = new ArrayList<>(); // Initialize the list of holograms
         calculateFinalLocationFunction = data.buildCalculateFinalLocationFunction(player, startLocation, true);
-        config = Blu3PrintPlugin.getPerPlayerBlu3printConfiguration(player.getUniqueId().toString());
+        config = Blu3PrintPlugin.getPerPlayerBlu3printConfig(player.getUniqueId().toString());
         if (config != null && !config.uuidMatches(blu3printUuid)) {
             // Clear config
             config = null;
-            Blu3PrintPlugin.setPerPlayerBlu3printConfiguration(player.getUniqueId().toString(), null);
+            Blu3PrintPlugin.setPerPlayerBlu3printConfig(player.getUniqueId().toString(), null);
             player.sendMessage(ChatColor.RED + "Cleared blu3print config as using different blu3print!");
         }
     }
@@ -82,7 +82,7 @@ public class Hologram {
             public void run() {
                 removeHologram();
             }
-        }.runTaskLater(Blu3PrintPlugin.getBlu3PrintPlugin(), 20 * Blu3printConfiguration.getHologramTtl());
+        }.runTaskLater(Blu3PrintPlugin.getBlu3PrintPlugin(), 20 * GlobalConfig.getHologramTtl());
     }
 
     private void buildArmourStand(Location l, MaterialData data) {

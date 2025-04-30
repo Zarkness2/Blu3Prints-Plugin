@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
@@ -103,7 +103,7 @@ public abstract class Blu3printData {
         }
 
         if (!blocksUnableToPlace.isEmpty()) {
-            if (forced && Blu3printConfiguration.isForcePlacementMessageEnabled()) {
+            if (forced && GlobalConfig.isForcePlacementMessageEnabled()) {
                 sendMessage(player, ChatColor.AQUA + "Forcing placing blu3print despite blocks in the way.");
             } else if (!forced) {
                 sendMessage(player, ChatColor.RED + "You can't place the blu3print here. There are blocks in the way.");
@@ -141,8 +141,8 @@ public abstract class Blu3printData {
 
     public Function<Location, Location> buildCalculateFinalLocationFunction(Player player, Location location,
             boolean onTop) {
-        final Alignment align = Blu3printConfiguration.getAlignment();
-        final boolean relative = Blu3printConfiguration.getRelativePlacement();
+        final Alignment align = GlobalConfig.getAlignment();
+        final boolean relative = GlobalConfig.getRelativePlacement();
         final BlockFace playerFacing = Orientation.getCartesianBlockFace(player.getFacing());
         Double x = location.getX();
         Double y = location.getY() + (onTop ? 1 : 0);
@@ -255,7 +255,7 @@ public abstract class Blu3printData {
     private Map<String, Integer> checkPlayerHasBLocksInInventory(Player player, boolean removeBlocks,
             Map<String, Integer> blocksUnableToPlace) {
         if (player.getGameMode() == GameMode.CREATIVE || player.hasPermission("blu3print.no-block-cost")) {
-            if (removeBlocks && Blu3printConfiguration.isFreePlacementMessageEnabled()) {
+            if (removeBlocks && GlobalConfig.isFreePlacementMessageEnabled()) {
                 sendMessage(player, ChatColor.GREEN + "Placing Blu3print for free!");
             }
             return new HashMap<>();
@@ -265,7 +265,7 @@ public abstract class Blu3printData {
 
         // Discount blocks unable to place
         if (player.isSneaking() && player.hasPermission("blu3print.force-place-discount")) {
-            if (Blu3printConfiguration.isDiscountPlacementMessageEnabled()) {
+            if (GlobalConfig.isDiscountPlacementMessageEnabled()) {
                 sendMessage(player, ChatColor.GREEN + "Placing Blu3print for discount as blocks in the way!");
             }
             blocksUnableToPlace.forEach((material, amount) -> {
@@ -437,7 +437,7 @@ public abstract class Blu3printData {
     }
 
     public String updateEncodingWithScale(Player player, int newScale) {
-        Integer maxScale = Blu3printConfiguration.getMaxScale();
+        Integer maxScale = GlobalConfig.getMaxScale();
         if (player != null && maxScale != null && newScale > maxScale) {
             if (!player.hasPermission("blu3print.no-scale-limit")) {
                 sendMessage(player, ChatColor.RED
@@ -446,7 +446,7 @@ public abstract class Blu3printData {
             }
         }
 
-        Integer maxOverallSize = Blu3printConfiguration.getMaxOverallSize();
+        Integer maxOverallSize = GlobalConfig.getMaxOverallSize();
         if (player != null && maxOverallSize != null && ((position.getXSize() * newScale) > maxOverallSize ||
                 (position.getYSize() * newScale) > maxOverallSize ||
                 (position.getZSize() * newScale) > maxOverallSize)) {

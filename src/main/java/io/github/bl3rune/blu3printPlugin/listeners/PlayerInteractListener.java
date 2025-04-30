@@ -188,8 +188,8 @@ public class PlayerInteractListener implements Listener {
             player.sendMessage(ChatColor.RED + "Blu3print missing ID");
             return;
         }
-
-        Blu3printData blu3printData = instance.getBlu3printFrpmCache(lore.get(1));
+        String blu3printUuid = lore.get(1);
+        Blu3printData blu3printData = instance.getBlu3printFrpmCache(blu3printUuid);
         
         if (blu3printData == null) {
             player.sendMessage(ChatColor.RED + "Blu3print ID missing from cache");
@@ -202,7 +202,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         Location startLocation = block.getLocation();
-        Hologram hologram = new Hologram(player, startLocation, blu3printData);
+        Hologram hologram = new Hologram(player, startLocation, blu3printData, blu3printUuid);
         hologram.placeHologram();
     }
 

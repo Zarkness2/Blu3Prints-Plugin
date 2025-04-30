@@ -1,5 +1,5 @@
 name: Blu3PrintPlugin
-version: '1.5.2'
+version: '1.6.0'
 main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
 api-version: '1.18'
 prefix: Blu3Print
@@ -72,6 +72,12 @@ commands:
     permission: blu3print.help
     permission-message: You don't have permission to do this
     aliases: [ blu3.help ]
+  blu3print.config:
+    description: Set per-player config for Blu3prints
+    usage: /<command>
+    permission: blu3print.config
+    permission-message: You don't have permission to do this
+    aliases: [ blu3.config ]
 permissions:
   blu3print.*:
     default: false
@@ -88,6 +94,7 @@ permissions:
       blu3print.name: true
       blu3print.help: true
       blu3print.holograms: true
+      blu3print.config: true
       blu3print.no-size-limit: true
       blu3print.no-scale-limit: true
       blu3print.force-place-discount: true
@@ -109,6 +116,7 @@ permissions:
       blu3print.name: true
       blu3print.help: true
       blu3print.holograms: true
+      blu3print.config: true
   blu3print:
     description: Allowed to get Blu3PrintPlugin usage
   blu3print.duplicate:
@@ -143,6 +151,8 @@ permissions:
     description: Allowed to ask for help with the Blu3PrintPlugin
   blu3print.holograms:
     description: Allowed to place hologram previews
+  blu3print.config:
+    description: Allowed to set per-player config for Blu3prints
   blu3print.update-available-message:
     default: op
     description: Display a message on login when an update is available

@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 
 public class PlayerJoinListener implements Listener {
 
@@ -19,7 +19,7 @@ public class PlayerJoinListener implements Listener {
         if (player == null) {
             return;
         }
-        if (!Blu3printConfiguration.isUpdateAvailableMessageEnabled()) {
+        if (!GlobalConfig.isUpdateAvailableMessageEnabled()) {
             return;
         }
         List<String> updates = Blu3PrintPlugin.getUpdateMessages();

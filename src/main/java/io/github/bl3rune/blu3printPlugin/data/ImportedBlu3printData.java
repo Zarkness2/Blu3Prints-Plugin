@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 
 import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.ROW_END;
@@ -19,7 +19,7 @@ public class ImportedBlu3printData extends Blu3printData {
     public ImportedBlu3printData(Player player, String encodedString) {
 
         if (materialIgnoreList.isEmpty()) {
-            materialIgnoreList = Blu3printConfiguration.getIgnoredMaterials();
+            materialIgnoreList = GlobalConfig.getIgnoredMaterials();
         }
 
         this.encoded = encodedString;
@@ -37,7 +37,7 @@ public class ImportedBlu3printData extends Blu3printData {
         }
         this.ingredientsCount = new HashMap<>();
 
-        Integer maxSize = Blu3printConfiguration.getMaxSize();
+        Integer maxSize = GlobalConfig.getMaxSize();
         if (player != null && maxSize != null && sizesExceedLimit(sizes, 1, maxSize)) {
             if (!player.hasPermission("blu3print.no-size-limit")) {
                 sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
@@ -47,7 +47,7 @@ public class ImportedBlu3printData extends Blu3printData {
 
         ManipulatablePosition dData = EncodingUtils.getDirectionalDataFromHeader(header);
 
-        Integer maxScale = Blu3printConfiguration.getMaxScale();
+        Integer maxScale = GlobalConfig.getMaxScale();
         if (player != null && maxScale != null && dData.getScale() > maxScale) {
             if (!player.hasPermission("blu3print.no-scale-limit")) {
                 sendMessage(player,ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
@@ -55,7 +55,7 @@ public class ImportedBlu3printData extends Blu3printData {
             }
         }
 
-        Integer maxOverallSize = Blu3printConfiguration.getMaxOverallSize();
+        Integer maxOverallSize = GlobalConfig.getMaxOverallSize();
         if (player != null && maxOverallSize != null && sizesExceedLimit(sizes, dData.getScale(), maxOverallSize)) {
             if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
                 sendMessage(player,ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");

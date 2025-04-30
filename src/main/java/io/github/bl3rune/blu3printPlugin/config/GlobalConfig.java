@@ -9,7 +9,7 @@ import io.github.bl3rune.blu3printPlugin.enums.SemanticLevel;
 
 import static io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin.logger;
 
-public class Blu3printConfiguration {
+public class GlobalConfig {
     
     private static Integer maxSize = null;
     private static Integer maxScale = null;

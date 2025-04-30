@@ -12,7 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
@@ -29,7 +29,7 @@ public class CapturedBlu3printData extends Blu3printData {
     public CapturedBlu3printData(Player player, String pos1, String pos2) {
 
         if (materialIgnoreList.isEmpty()) {
-            materialIgnoreList = Blu3printConfiguration.getIgnoredMaterials();
+            materialIgnoreList = GlobalConfig.getIgnoredMaterials();
         }
 
         Location loc1 = LocationUtils.getCoordsFromPosString(pos1);
@@ -54,7 +54,7 @@ public class CapturedBlu3printData extends Blu3printData {
         int ySize = locY[1] - locY[0] + 1;
         int zSize = locZ[1] - locZ[0] + 1;
 
-        Integer maxSize = Blu3printConfiguration.getMaxSize();
+        Integer maxSize = GlobalConfig.getMaxSize();
         if (player != null && maxSize != null && sizesExceedLimit(new int[] {xSize,ySize,zSize}, 1, maxSize)) {
             if (!player.hasPermission("blu3print.no-size-limit")) {
                 sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");

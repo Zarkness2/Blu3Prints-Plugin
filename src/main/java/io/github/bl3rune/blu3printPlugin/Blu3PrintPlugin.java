@@ -29,8 +29,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
-import io.github.bl3rune.blu3printPlugin.config.Blu3printConfiguration;
-import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfiguration;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
+import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
@@ -51,7 +51,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     // Static Fields
     private static Blu3PrintPlugin instance;
     private static List<String> updateMessages = new ArrayList<>();
-    private static Map<String,PerPlayerBlu3printConfiguration> playerConfig = new HashMap<>(); // Clears on server restart
+    private static Map<String,PerPlayerBlu3printConfig> playerConfig = new HashMap<>(); // Clears on server restart
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
@@ -61,11 +61,11 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         return updateMessages;
     }
 
-    public static PerPlayerBlu3printConfiguration getPerPlayerBlu3printConfiguration(String playerUUID) {
+    public static PerPlayerBlu3printConfig getPerPlayerBlu3printConfig(String playerUUID) {
         return playerConfig.getOrDefault(playerUUID, null);
     }
 
-    public static void setPerPlayerBlu3printConfiguration(String playerUUID, PerPlayerBlu3printConfiguration ppbc) {
+    public static void setPerPlayerBlu3printConfig(String playerUUID, PerPlayerBlu3printConfig ppbc) {
         if (ppbc == null) {
             playerConfig.remove(playerUUID);
         } else {
@@ -89,7 +89,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         instance = this;
         getConfig().options().copyDefaults();
         saveDefaultConfig();
-        Blu3printConfiguration.refreshConfiguration();
+        GlobalConfig.refreshConfiguration();
         addBlu3printRecipes();
 
         loadSavedBlueprintsToCache();
@@ -111,13 +111,13 @@ public final class Blu3PrintPlugin extends JavaPlugin {
             public void run() {
                 checkUpdate();
             }
-        }.runTaskTimer(this, 0, (60 * 60 * 20 * Blu3printConfiguration.getUpdateCheckInterval())); // Run every X hours
+        }.runTaskTimer(this, 0, (60 * 60 * 20 * GlobalConfig.getUpdateCheckInterval())); // Run every X hours
 
     }
 
     public void checkUpdate() {
         try {
-            SemanticLevel semanticLevel = Blu3printConfiguration.getUpdateLoggingLevel();
+            SemanticLevel semanticLevel = GlobalConfig.getUpdateLoggingLevel();
             if (semanticLevel == SemanticLevel.NONE) {
                 return;
             }
@@ -155,7 +155,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     }
 
     public List<String> getUpdateMessageDetails() {
-        SemanticLevel semanticLevel = Blu3printConfiguration.getUpdateLoggingLevel();
+        SemanticLevel semanticLevel = GlobalConfig.getUpdateLoggingLevel();
         String version = this.getDescription().getVersion();
         String[] v = version.split("\\.");
         List<String> updateMessages = new ArrayList<>();
@@ -243,7 +243,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
                 map.put(entry.getKey(), data);
             }
             getLogger().warning("Loaded Cached blu3prints from blu3prints.json");
-            if (Blu3printConfiguration.isImportedBlu3printsLoggingEnabled()) {
+            if (GlobalConfig.isImportedBlu3printsLoggingEnabled()) {
                 map.forEach((k, v) -> getLogger().info(k + " : " + v.getEncodedString()));
             }
             cachedBlueprints = map;

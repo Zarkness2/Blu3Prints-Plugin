@@ -1,5 +1,5 @@
 name: Blu3PrintPlugin
-version: '1.6.0'
+version: '1.6.1'
 main: io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin
 api-version: '1.18'
 prefix: Blu3Print
@@ -17,66 +17,67 @@ commands:
     description: Duplicate the Blu3Print currently held (If a blank Blu3Print is in inventory)
     usage: /<command>
     permission: blu3print.duplicate
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission duplicate this
     aliases: [ blu3.duplicate ]
   blu3print.rotate:
     description: Rotate the Blu3Print currently held
     usage: /<command> <#optional# rotation> (default next rotation)
     permission: blu3print.rotate
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to rotate this
     aliases: [ blu3.rotate ]
   blu3print.turn:
     description: Turn the Blu3Print currently held
     usage: /<command> <turn>
     permission: blu3print.turn
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to turn this
     aliases: [ blu3.turn ]
   blu3print.face:
     description: Change the direction of the Blu3Print currently held
     usage: /<command> <#optional# direction> (default next face)
     permission: blu3print.face
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to change the direction of this
     aliases: [ blu3.face ]
   blu3print.import:
     description: Import a Blu3Print from a string to the current held Blu3Print
     usage: /<command> <name> <encodedString>
     permission: blu3print.import
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to import
     aliases: [ blu3.import ]
   blu3print.export:
     description: Export the Blu3Print currently held to a string
     usage: /<command>
     permission: blu3print.export
+    permission-message: You don't have permission to export
     aliases: [ blu3.export ]
   blu3print.scale:
     description: Change the scale of the Blu3Print currently held
     usage: /<command> <#optional# scale> (default current * 2)
     permission: blu3print.scale
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to change the scale of this
     aliases: [ blu3.scale ]
   blu3print.name:
     description: Set the name of the Blu3Print currently held
     usage: /<command> <name>
     permission: blu3print.name
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to rename this
     aliases: [ blu3.name ]
   blu3print.give:
     description: Gives player a blu3print
     usage: /<command> <#optional# player>
     permission: blu3print.give
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to give players a blu3print writer
     aliases: [ blu3.give ]
   blu3print.help:
     description: Get help for Blu3PrintPlugin
     usage: /<command>
     permission: blu3print.help
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to get help for Blu3PrintPlugin
     aliases: [ blu3.help ]
   blu3print.config:
     description: Set per-player config for Blu3prints
     usage: /<command>
     permission: blu3print.config
-    permission-message: You don't have permission to do this
+    permission-message: You don't have permission to set config for Blu3prints
     aliases: [ blu3.config ]
 permissions:
   blu3print.*:

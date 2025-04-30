@@ -9,6 +9,7 @@ import io.github.bl3rune.blu3printPlugin.commands.ConfigTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.FaceCommand;
 import io.github.bl3rune.blu3printPlugin.commands.FaceTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.ScaleCommand;
+import io.github.bl3rune.blu3printPlugin.commands.ScaleTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.TurnCommand;
 import io.github.bl3rune.blu3printPlugin.commands.TurnTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.DuplicateCommand;
@@ -32,7 +33,7 @@ public enum CommandType {
     TURN("turn", new TurnCommand(), new TurnTabCompleter()),
     IMPORT("import", new ImportCommand()),
     EXPORT("export", new ExportCommand()),
-    SCALE("scale", new ScaleCommand()),
+    SCALE("scale", new ScaleCommand(), new ScaleTabCompleter()),
     NAME("name", new NameCommand()),
     GIVE("give", new GiveCommand()),
     HELP("help", new HelpCommand()),

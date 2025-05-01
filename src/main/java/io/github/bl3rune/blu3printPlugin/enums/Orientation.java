@@ -73,6 +73,21 @@ public enum Orientation {
         return true;
     }
 
+    public Orientation getNextCompass() {
+        switch(this) {
+            case NORTH:
+                return Orientation.EAST;
+            case EAST:
+                return Orientation.SOUTH;
+            case SOUTH:
+                return Orientation.WEST;
+            case WEST:
+            default:
+                return Orientation.NORTH;
+
+        }
+    }
+
     public Orientation getNextOrientation() {
         switch (this) {
             case DOWN:

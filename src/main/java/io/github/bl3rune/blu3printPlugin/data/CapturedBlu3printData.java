@@ -16,6 +16,7 @@ import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 import io.github.bl3rune.blu3printPlugin.listeners.PlayerInteractListener;
+import io.github.bl3rune.blu3printPlugin.utils.EdgeCaseBlockUtils;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 import io.github.bl3rune.blu3printPlugin.utils.LocationUtils;
 import io.github.bl3rune.blu3printPlugin.utils.Pair;
@@ -79,8 +80,9 @@ public class CapturedBlu3printData extends Blu3printData {
                         selectionGrid[z][y][x] = new ImportedMaterialData(null, Material.AIR, null, 1);
                     } else {
                         String blockName = block.getType().name();
-                        ingredientsCount.put(blockName, ingredientsCount.getOrDefault(blockName, 0) + 1);
                         MaterialData materialData = new CapturedMaterialData(block);
+                        int toAdd = EdgeCaseBlockUtils.getEdgeCaseIngredientCountToAdd(materialData);
+                        ingredientsCount.put(blockName, ingredientsCount.getOrDefault(blockName, 0) + toAdd);
                         ingredientsCountComplex.put(materialData.getName(), ingredientsCountComplex.getOrDefault(materialData.getName(), 0) + 1);
                         selectionGrid[z][y][x] = materialData;
                     }

@@ -27,6 +27,7 @@ import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
 import io.github.bl3rune.blu3printPlugin.enums.Turn;
+import io.github.bl3rune.blu3printPlugin.utils.EdgeCaseBlockUtils;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 import io.github.bl3rune.blu3printPlugin.utils.Pair;
 
@@ -133,7 +134,7 @@ public abstract class Blu3printData {
                 continue;
             }
 
-            placeBlock(placeLocation, data);
+            placeBlock(player, placeLocation, data);
             coords = position.next(true);
         }
 
@@ -148,7 +149,7 @@ public abstract class Blu3printData {
         Double y = location.getY() + (onTop ? 1 : 0);
         Double z = location.getZ();
         double xSize = position.getXSize();
-        double xSizeScaled = xSize * position.getScale(); 
+        double xSizeScaled = xSize * position.getScale();
 
         if (relative) {
             switch (playerFacing) {
@@ -176,7 +177,7 @@ public abstract class Blu3printData {
                     break;
                 case WEST:
                     if (xSize > 1 && align == Alignment.LEFT) {
-                        z = z -  xSizeScaled;
+                        z = z - xSizeScaled;
                     } else if (xSize > 1 && align == Alignment.CENTER) {
                         z = z - (xSizeScaled / 2);
                     }
@@ -384,7 +385,7 @@ public abstract class Blu3printData {
         return ingCountCopy;
     }
 
-    private boolean placeBlock(Location location, MaterialData materialData) {
+    private boolean placeBlock(Player player, Location location, MaterialData materialData) {
 
         World world = Bukkit.getWorld(location.getWorld().getName());
         if (world == null) {
@@ -392,9 +393,10 @@ public abstract class Blu3printData {
             return false;
         }
 
-        world.setType(location, materialData.getMaterial());
         String complexData = materialData.getComplexData();
-        if (complexData != null) {
+        if (EdgeCaseBlockUtils.isEdgeCaseBlock(materialData)) {
+            EdgeCaseBlockUtils.handleEdgeCasePlacement(player, location, materialData);
+        } else if (complexData != null) {
             try {
                 BlockData blockData = Bukkit.createBlockData(complexData);
                 world.setBlockData(location, blockData);
@@ -402,6 +404,8 @@ public abstract class Blu3printData {
                 /* Tried to apply invalid block data */
                 // e.printStackTrace();
             }
+        } else {
+            world.setType(location, materialData.getMaterial());
         }
         return true;
     }

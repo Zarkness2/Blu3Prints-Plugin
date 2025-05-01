@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
+import io.github.bl3rune.blu3printPlugin.utils.EdgeCaseBlockUtils;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 
 import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.ROW_END;
@@ -102,8 +103,9 @@ public class ImportedBlu3printData extends Blu3printData {
             this.selectionGrid[coords[0]][coords[1]][coords[2]] = materialData;
         }
         if (materialData.getName() != null) {
-            int count = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
-            this.ingredientsCount.put(materialData.getMaterial().name(), count + materialData.getCount());
+            int existing = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
+            int toAdd = EdgeCaseBlockUtils.getEdgeCaseIngredientCountToAdd(materialData);
+            this.ingredientsCount.put(materialData.getMaterial().name(), existing + toAdd);
         }
     }
 
@@ -116,8 +118,10 @@ public class ImportedBlu3printData extends Blu3printData {
             added++;
         }
         if (materialData.getName() != null) {
-            int count = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
-            this.ingredientsCount.put(materialData.getMaterial().name(), count + added);
+            int existing = this.ingredientsCount.getOrDefault(materialData.getMaterial().name(), 0);
+            materialData.setCount(added);
+            int toAdd = EdgeCaseBlockUtils.getEdgeCaseIngredientCountToAdd(materialData);
+            this.ingredientsCount.put(materialData.getMaterial().name(), existing + toAdd);
         }
     }
 

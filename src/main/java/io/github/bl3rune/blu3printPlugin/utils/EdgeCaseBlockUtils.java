@@ -1,14 +1,16 @@
 package io.github.bl3rune.blu3printPlugin.utils;
 
-import java.util.Map;
-
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Door.Hinge;
 import org.bukkit.entity.Player;
 
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
@@ -26,8 +28,14 @@ public class EdgeCaseBlockUtils {
     }
 
     public static int getEdgeCaseIngredientCountToAdd(MaterialData materialData) {
-        if (Tag.BEDS.isTagged(materialData.getMaterial())) {
+        Material material = materialData.getMaterial();
+        if (Tag.BEDS.isTagged(material)) {
             if (materialData.getComplexData().contains("part=foot")) {
+                return 0;
+            }
+        }
+        if (Tag.DOORS.isTagged(material)) {
+            if (materialData.getComplexData().contains("half=upper")) {
                 return 0;
             }
         }
@@ -36,8 +44,12 @@ public class EdgeCaseBlockUtils {
 
     public static void handleEdgeCasePlacement(Player player, Location location, MaterialData materialData) {
         // Handle the edge cases
-        if (Tag.BEDS.isTagged(materialData.getMaterial())) {
+        Material material = materialData.getMaterial();
+        if (Tag.BEDS.isTagged(material)) {
             handleBedPlacement(player, location, materialData);
+        }
+        if (Tag.DOORS.isTagged(material)) {
+            handleDoorPlacement(player, location, materialData);
         }
         return;
     }
@@ -67,6 +79,10 @@ public class EdgeCaseBlockUtils {
             }
 
         }
+        if (o == null || !o.isCompass()) {
+            player.sendMessage(ChatColor.RED + "Bed is not flat, cannot place");
+            return;
+        }
         final BlockFace facing = o.getBlockFace();
         for (Bed.Part part : Bed.Part.values()) {
             block.setBlockData(Bukkit.createBlockData(materialData.getMaterial(), (data) -> {
@@ -74,6 +90,28 @@ public class EdgeCaseBlockUtils {
                 ((Bed) data).setFacing(facing);
             }));
             block = block.getRelative(facing.getOppositeFace());
+        }
+    }
+
+    private static void handleDoorPlacement(Player player, Location location, MaterialData materialData) {
+        if (materialData.getComplexData().contains("half=lower")) {
+            return;
+        }
+        Block block = location.getBlock();
+        Orientation o = materialData.getFace();
+        if (!o.isCompass()) {
+            player.sendMessage(ChatColor.RED + "Door is not vertical, cannot place");
+            return;
+        }
+        final BlockFace facing = o.getBlockFace();
+        String cData = materialData.getComplexData();
+        for (Bisected.Half part : Bisected.Half.values()) {
+            block.setBlockData(Bukkit.createBlockData(materialData.getMaterial(), (data) -> {
+                ((Door) data).setFacing(facing);
+                ((Door) data).setHalf(part);
+                ((Door) data).setHinge(cData.contains("hinge=right") ? Hinge.RIGHT : Hinge.LEFT);
+            }));
+            block = block.getRelative(BlockFace.DOWN);
         }
     }
 

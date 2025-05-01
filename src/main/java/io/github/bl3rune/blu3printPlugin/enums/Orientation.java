@@ -82,9 +82,9 @@ public enum Orientation {
             case SOUTH:
                 return Orientation.WEST;
             case WEST:
-            default:
                 return Orientation.NORTH;
-
+            default:
+               return null;
         }
     }
 

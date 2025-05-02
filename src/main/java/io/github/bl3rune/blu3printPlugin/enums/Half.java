@@ -1,9 +1,13 @@
 package io.github.bl3rune.blu3printPlugin.enums;
 
+import org.bukkit.block.data.BlockData;
+
 public enum Half {
 
     TOP(org.bukkit.block.data.Bisected.Half.TOP),
-    BOTTOM(org.bukkit.block.data.Bisected.Half.BOTTOM);
+    BOTTOM(org.bukkit.block.data.Bisected.Half.BOTTOM),
+    UPPER(org.bukkit.block.data.Bisected.Half.TOP),
+    LOWER(org.bukkit.block.data.Bisected.Half.BOTTOM);
 
     private org.bukkit.block.data.Bisected.Half half;
     private String fullName;
@@ -11,23 +15,25 @@ public enum Half {
 
     Half(org.bukkit.block.data.Bisected.Half half) {
         this.half = half;
-        this.fullName = "half=" + half.name().toLowerCase();
-        this.shortName = "h=" + half.name().toLowerCase().substring(0, 1);
+        this.fullName = "half=" + name().toLowerCase();
+        this.shortName = "h=" + name().toLowerCase().substring(0, 1);
     }
     
     public org.bukkit.block.data.Bisected.Half getHalf() {
         return half;
     }
+
     public String getFullName() {
         return fullName;
     }
+
     public String getShortName() {
         return shortName;
     }
 
-    public static Half fromBukkit(org.bukkit.block.data.Bisected.Half half) {
+    public static Half fromBukkit(BlockData data) {
         for (Half bisected : values()) {
-            if (bisected.getHalf() == half) {
+            if (data.getAsString().contains(bisected.getFullName())) {
                 return bisected;
             }
         }

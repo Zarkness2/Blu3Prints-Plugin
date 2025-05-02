@@ -50,8 +50,7 @@ public class CapturedMaterialData extends MaterialData {
         "open=false",
         "up=true",
         "snowy=false",
-        "hinge=left",
-        "half=lower"
+        "hinge=left"
     );
 
     public CapturedMaterialData(Block block) {
@@ -106,7 +105,7 @@ public class CapturedMaterialData extends MaterialData {
             rawBlockData = addKey(rawBlockData, attachedFace.getShortName());
         }
         if (blockData instanceof Bisected) {
-            half = Half.fromBukkit(((Bisected) blockData).getHalf());
+            half = Half.fromBukkit(blockData);
             rawBlockData = addKey(rawBlockData, half.getShortName());
         }
         if (blockData instanceof Slab) {

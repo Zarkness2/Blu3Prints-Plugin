@@ -91,6 +91,9 @@ public abstract class Blu3printData {
     // PLACING BLU3PRINT SECTION
 
     public void placeBlocks(Player player, Location location, boolean forced, boolean onTop) {
+        if (!playerAllowedToUse(player)) {
+            return;
+        }
         Function<Location, Location> calculateFinalLocation = buildCalculateFinalLocationFunction(player, location,
                 onTop);
         Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(calculateFinalLocation);
@@ -498,6 +501,38 @@ public abstract class Blu3printData {
 
     protected boolean isBlockIgnorable(Block block) {
         return block == null || block.isEmpty() || materialIgnoreList.contains(block.getType().name());
+    }
+
+    
+    protected boolean playerAllowedToUse(Player player) {
+        int scale = position.getScale();
+        int [] sizes = new int [] { position.getXSize(), position.getYSize(), position.getZSize() };
+
+        Integer maxSize = GlobalConfig.getMaxSize();
+        if (player != null && maxSize != null && sizesExceedLimit(sizes, 1, maxSize)) {
+            if (!player.hasPermission("blu3print.no-size-limit")) {
+                sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                return false;
+            }
+        }
+
+        Integer maxScale = GlobalConfig.getMaxScale();
+        if (player != null && maxScale != null && scale > maxScale) {
+            if (!player.hasPermission("blu3print.no-scale-limit")) {
+                sendMessage(player,ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
+                return false;
+            }
+        }
+
+        Integer maxOverallSize = GlobalConfig.getMaxOverallSize();
+        if (player != null && maxOverallSize != null && sizesExceedLimit(sizes, scale, maxOverallSize)) {
+            if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
+                sendMessage(player,ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected boolean sizesExceedLimit(int[] sizes, int scale, int max) {

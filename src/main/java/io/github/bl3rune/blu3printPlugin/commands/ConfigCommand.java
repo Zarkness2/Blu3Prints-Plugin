@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
-import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Config;
 import io.github.bl3rune.blu3printPlugin.utils.InventoryUtils;
 
@@ -53,13 +53,13 @@ public class ConfigCommand implements CommandExecutor {
             String blu3printUuid = lore.get(1);
 
             String playerUUID = player.getUniqueId().toString();
-            PerPlayerBlu3printConfig ppbc = Blu3PrintPlugin.getPerPlayerBlu3printConfig(playerUUID);
+            PlayerBlu3printConfig ppbc = Blu3PrintPlugin.getPlayerBlu3printConfig(playerUUID);
             if (ppbc == null) {
-                ppbc = new PerPlayerBlu3printConfig(blu3printUuid);
+                ppbc = new PlayerBlu3printConfig(blu3printUuid);
             }
             switch (config) {
                 case CLEAR:
-                    Blu3PrintPlugin.setPerPlayerBlu3printConfig(playerUUID, null);
+                    Blu3PrintPlugin.setPlayerBlu3printConfig(playerUUID, null);
                     player.sendMessage(ChatColor.GREEN + "Player blu3print config reset!");
                     return true;
                 case HOLOGRAM_VIEW_XYZ:
@@ -72,13 +72,13 @@ public class ConfigCommand implements CommandExecutor {
                     break;
             }
             if (ppbc != null) {
-                Blu3PrintPlugin.setPerPlayerBlu3printConfig(playerUUID, ppbc);
+                Blu3PrintPlugin.setPlayerBlu3printConfig(playerUUID, ppbc);
             }
         }
         return true;
     }
 
-    private PerPlayerBlu3printConfig setHologramViewLayers(PerPlayerBlu3printConfig ppbc,  String [] args, Config config, Player player) {
+    private PlayerBlu3printConfig setHologramViewLayers(PlayerBlu3printConfig ppbc,  String [] args, Config config, Player player) {
         if (args.length < 2 || (config == Config.HOLOGRAM_VIEW_XYZ && args.length < 4)) {
             player.sendMessage(ChatColor.RED + "Not enough arguments for setting hologram view layers");
             return null;

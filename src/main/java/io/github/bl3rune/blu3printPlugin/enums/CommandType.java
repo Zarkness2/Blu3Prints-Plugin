@@ -16,6 +16,8 @@ import io.github.bl3rune.blu3printPlugin.commands.DuplicateCommand;
 import io.github.bl3rune.blu3printPlugin.commands.ExportCommand;
 import io.github.bl3rune.blu3printPlugin.commands.GiveCommand;
 import io.github.bl3rune.blu3printPlugin.commands.GiveTabCompleter;
+import io.github.bl3rune.blu3printPlugin.commands.GlobalConfigCommand;
+import io.github.bl3rune.blu3printPlugin.commands.GlobalConfigTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.HelpCommand;
 import io.github.bl3rune.blu3printPlugin.commands.ImportCommand;
 import io.github.bl3rune.blu3printPlugin.commands.NameCommand;
@@ -38,7 +40,8 @@ public enum CommandType {
     NAME("name", new NameCommand()),
     GIVE("give", new GiveCommand(), new GiveTabCompleter()),
     HELP("help", new HelpCommand()),
-    CONFIG("config", new ConfigCommand(), new ConfigTabCompleter())
+    CONFIG("config", new ConfigCommand(), new ConfigTabCompleter()),
+    GLOBAL("global-config", new GlobalConfigCommand(), new GlobalConfigTabCompleter())
     ;
 
     private final String commandString;

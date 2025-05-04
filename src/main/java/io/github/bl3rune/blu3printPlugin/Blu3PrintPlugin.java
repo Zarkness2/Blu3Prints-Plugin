@@ -30,7 +30,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
-import io.github.bl3rune.blu3printPlugin.config.PerPlayerBlu3printConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
@@ -51,7 +51,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     // Static Fields
     private static Blu3PrintPlugin instance;
     private static List<String> updateMessages = new ArrayList<>();
-    private static Map<String,PerPlayerBlu3printConfig> playerConfig = new HashMap<>(); // Clears on server restart
+    private static Map<String,PlayerBlu3printConfig> playerConfig = new HashMap<>(); // Clears on server restart
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
@@ -61,11 +61,11 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         return updateMessages;
     }
 
-    public static PerPlayerBlu3printConfig getPerPlayerBlu3printConfig(String playerUUID) {
+    public static PlayerBlu3printConfig getPlayerBlu3printConfig(String playerUUID) {
         return playerConfig.getOrDefault(playerUUID, null);
     }
 
-    public static void setPerPlayerBlu3printConfig(String playerUUID, PerPlayerBlu3printConfig ppbc) {
+    public static void setPlayerBlu3printConfig(String playerUUID, PlayerBlu3printConfig ppbc) {
         if (ppbc == null) {
             playerConfig.remove(playerUUID);
         } else {
@@ -113,6 +113,14 @@ public final class Blu3PrintPlugin extends JavaPlugin {
             }
         }.runTaskTimer(this, 0, (60 * 60 * 20 * GlobalConfig.getUpdateCheckInterval())); // Run every X hours
 
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+        getLogger().info("Stopping Blu3Print Plugin");
+        saveCachedBlu3prints();
+        saveConfig();
     }
 
     public void checkUpdate() {
@@ -191,13 +199,6 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         }
 
         return updateMessages;
-    }
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-        getLogger().info("Stopping Blu3Print Plugin");
-        saveCachedBlu3prints();
     }
 
     private void addBlu3printRecipes() {

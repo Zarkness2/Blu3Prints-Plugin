@@ -38,33 +38,13 @@ public class ImportedBlu3printData extends Blu3printData {
         }
         this.ingredientsCount = new HashMap<>();
 
-        Integer maxSize = GlobalConfig.getMaxSize();
-        if (player != null && maxSize != null && sizesExceedLimit(sizes, 1, maxSize)) {
-            if (!player.hasPermission("blu3print.no-size-limit")) {
-                sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
-                return;
-            }
-        }
-
         ManipulatablePosition dData = EncodingUtils.getDirectionalDataFromHeader(header);
 
-        Integer maxScale = GlobalConfig.getMaxScale();
-        if (player != null && maxScale != null && dData.getScale() > maxScale) {
-            if (!player.hasPermission("blu3print.no-scale-limit")) {
-                sendMessage(player,ChatColor.RED + "You do not have permission to increase scale over the max scale limit of " + maxScale + "!");
-                return;
-            }
-        }
-
-        Integer maxOverallSize = GlobalConfig.getMaxOverallSize();
-        if (player != null && maxOverallSize != null && sizesExceedLimit(sizes, dData.getScale(), maxOverallSize)) {
-            if (!player.hasPermission("blu3print.no-scale-limit") && !player.hasPermission("blu3print.no-size-limit")) {
-                sendMessage(player,ChatColor.RED + "You do not have permission to increase size over the max overall size limit of " + maxOverallSize + "!");
-                return;
-            }
-        }
-
         this.position = new ManipulatablePosition(sizes[2], sizes[1], sizes[0], dData.getOrientation(), dData.getRotation(), dData.getScale());
+
+        if (!playerAllowedToUse(player)) {
+            return;
+        }
 
         buildSelectionGrid(EncodingUtils.getBodyFromEncoding(encodedString));
         if (dData.getScale() > 1) {

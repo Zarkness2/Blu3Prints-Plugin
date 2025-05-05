@@ -52,6 +52,7 @@ public class GlobalConfig {
         updateAvailableMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.update-available-message.enabled");
         cooldownMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.cooldown-message.enabled");
         // Logging settings
+        verboseLogging = tryAndGetConfigFlag("blu3print.logging.verbose");
         importedBlu3printsLoggingEnabled = tryAndGetConfigFlag("blu3print.logging.imported-blu3prints.enabled");
         updateLoggingLevel = tryAndGetConfigEnum("blu3print.logging.update-level", SemanticLevel.class);
 

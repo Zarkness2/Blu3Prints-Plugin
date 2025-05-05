@@ -9,6 +9,7 @@ import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 import io.github.bl3rune.blu3printPlugin.enums.GConfig;
+import io.github.bl3rune.blu3printPlugin.enums.SemanticLevel;
 
 public class GlobalConfigCommand implements CommandExecutor {
 
@@ -46,12 +47,23 @@ public class GlobalConfigCommand implements CommandExecutor {
                 case MAX_OVERALL_SIZE:
                 case HOLOGRAM_TTL:
                 case COOLDOWN:
+                case UPDATE_CHECK_INTERVAL:
                     plugin.getConfig().set(config.getConfigPath(), Integer.parseInt(args[1]));
                     break;
                 case ALIGNMENT:
-                    plugin.getConfig().set(config.getConfigPath(), Alignment.valueOf(args[1]));
+                    plugin.getConfig().set(config.getConfigPath(), Alignment.valueOf(args[1]).name());
+                    break;
+                case UPDATE_LEVEL:
+                    plugin.getConfig().set(config.getConfigPath(), SemanticLevel.valueOf(args[1]).name());
                     break;
                 case RELATIVE:
+                case FREE_PLACEMENT_MESSAGE:
+                case FORCED_PLACEMENT_MESSAGE:
+                case DISCOUNT_PLACEMENT_MESSAGE:
+                case UPDATE_AVAILABLE_MESSAGE:
+                case COOLDOWN_MESSAGE:
+                case VERBOSE_LOGGING:
+                case IMPORTED_BLU3PRINTS_LOGGING:
                     plugin.getConfig().set(config.getConfigPath(), Boolean.parseBoolean(args[1]));
                     break;
                 default:
@@ -69,32 +81,7 @@ public class GlobalConfigCommand implements CommandExecutor {
     private void printCurrentConfig(CommandSender sender) {
         sender.sendMessage("Current Configurations:");
         for (GConfig config : GConfig.values()) {
-            sender.sendMessage(config.getConfigPath() + ": " + getConfigValue(config));
-        }
-    }
-
-    private String getConfigValue(GConfig config) {
-        try {
-            switch (config) {
-                case ALIGNMENT:
-                    return "" + GlobalConfig.getAlignment().name();
-                case COOLDOWN:
-                    return "" + GlobalConfig.getCooldown();
-                case HOLOGRAM_TTL:
-                    return "" + GlobalConfig.getHologramTtl();
-                case MAX_OVERALL_SIZE:
-                    return "" + GlobalConfig.getMaxOverallSize();
-                case MAX_SCALE:
-                    return "" + GlobalConfig.getMaxScale();
-                case MAX_SIZE:
-                    return "" + GlobalConfig.getMaxSize();
-                case RELATIVE:
-                    return "" + GlobalConfig.getRelativePlacement();
-                default:
-                    return "";
-            }
-        } catch (Exception e) {
-            return "";
+            sender.sendMessage(config.getConfigPath() + ": " + config.getCurrentValue());
         }
     }
 

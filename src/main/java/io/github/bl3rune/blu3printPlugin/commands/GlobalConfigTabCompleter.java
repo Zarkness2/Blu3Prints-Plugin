@@ -24,9 +24,7 @@ public class GlobalConfigTabCompleter implements TabCompleter {
                 switch (config) {
                     case HOLOGRAM_TTL:
                     case MAX_SCALE:
-                        return IntStream.rangeClosed(1, 15).boxed().map(i -> 
-                            i.toString()
-                        ).collect(Collectors.toList());
+                        return IntStream.rangeClosed(1, 15).boxed().map(i -> i.toString()).collect(Collectors.toList());
                     case MAX_OVERALL_SIZE:
                     case MAX_SIZE:
                     case COOLDOWN:
@@ -34,8 +32,14 @@ public class GlobalConfigTabCompleter implements TabCompleter {
                             i = i * 100;
                             return i.toString();
                         }).collect(Collectors.toList());
+                    case UPDATE_CHECK_INTERVAL:
+                        return IntStream.rangeClosed(1, 9).boxed().map(i -> {
+                            i = i * 12;
+                            return i.toString();
+                        }).collect(Collectors.toList());
                     case ALIGNMENT:
-                        return Arrays.asList(Alignment.values()).stream().map(a -> a.name()).collect(Collectors.toList());
+                        return Arrays.asList(Alignment.values()).stream().map(a -> a.name())
+                                .collect(Collectors.toList());
                     case RELATIVE:
                     case FREE_PLACEMENT_MESSAGE:
                     case FORCED_PLACEMENT_MESSAGE:

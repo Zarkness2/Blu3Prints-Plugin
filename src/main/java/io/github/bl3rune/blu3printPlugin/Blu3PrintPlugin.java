@@ -83,10 +83,9 @@ public final class Blu3PrintPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
         // Plugin startup logic
         getLogger().info("Starting Blu3Print Plugin");
-        checkUpdate();
-        instance = this;
         getConfig().options().copyDefaults();
         saveDefaultConfig();
         GlobalConfig.refreshConfiguration();
@@ -158,7 +157,10 @@ public final class Blu3PrintPlugin extends JavaPlugin {
                 updateMessages.forEach(um -> Bukkit.getConsoleSender().sendMessage(um));
             }
         } catch (Exception ex) {
-            Bukkit.getConsoleSender().sendMessage("§cCould not check for Updates!");
+            Bukkit.getConsoleSender().sendMessage("§cCould not check for updates!");
+            if (GlobalConfig.isVerboseLogging()) {
+                ex.printStackTrace();
+            }
         }
     }
 

@@ -218,7 +218,7 @@ public class PlayerInteractListener implements Listener {
             player.sendMessage(ChatColor.RED + "Blu3print ID missing from cache");
             return;
         }
-        player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + meta.getDisplayName());
+        player.sendMessage(meta.getDisplayName());
         player.sendMessage(blu3printItem.toString());
     }
 

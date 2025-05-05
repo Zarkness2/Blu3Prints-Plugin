@@ -75,16 +75,16 @@ public abstract class Blu3printData {
         sb.append(ChatColor.WHITE).append("Ingredients:").append("\n").append(ChatColor.GRAY);
         ingredientsCount.forEach((k, v) -> sb.append(" - ")
                 .append(k.replace("_", " "))
-                .append(" : ")
+                .append(": ")
                 .append(v * position.getScalingIngredientsMultiplier()).append("\n"));
 
         sb.append(ChatColor.WHITE).append("Position:").append("\n").append(ChatColor.GRAY);
-        sb.append(" - X:Y:Z Sizes :").append(position.getXSize() * position.getScale()).append(" : ");
+        sb.append(" - X:Y:Z Sizes: ").append(position.getXSize() * position.getScale()).append(" : ");
         sb.append(position.getYSize() * position.getScale()).append(" : ");
         sb.append(position.getZSize() * position.getScale()).append("\n");
-        sb.append(" - Orientation :").append(position.getOrientation().name()).append("\n");
-        sb.append(" - Rotation :").append(position.getRotation().name()).append("\n");
-        sb.append(" - Scale :").append(position.getScale()).append("\n");
+        sb.append(" - Orientation: ").append(position.getOrientation().name()).append("\n");
+        sb.append(" - Rotation: ").append(position.getRotation().name()).append("\n");
+        sb.append(" - Scale: ").append(position.getScale()).append("\n");
         return sb.toString();
     }
 
@@ -157,15 +157,15 @@ public abstract class Blu3printData {
         if (relative) {
             switch (playerFacing) {
                 case NORTH:
-                    if (xSize > 1 && align == Alignment.RIGHT) {
-                        x = x + xSizeScaled;
+                    if (xSize > 1 && align == Alignment.LEFT) {
+                        x = x + xSizeScaled - 1;
                     } else if (xSize > 1 && align == Alignment.CENTER) {
                         x = x + (xSizeScaled / 2);
                     }
                     break;
                 case EAST:
                     if (xSize > 1 && align == Alignment.LEFT) {
-                        z = z + xSizeScaled;
+                        z = z + xSizeScaled - 1;
                     } else if (xSize > 1 && align == Alignment.CENTER) {
                         z = z + (xSizeScaled / 2);
                     }
@@ -173,14 +173,14 @@ public abstract class Blu3printData {
                 case SOUTH:
                 default:
                     if (xSize > 1 && align == Alignment.LEFT) {
-                        x = x - xSizeScaled;
+                        x = x - xSizeScaled + 1;
                     } else if (xSize > 1 && align == Alignment.CENTER) {
                         x = x - (xSizeScaled / 2);
                     }
                     break;
                 case WEST:
                     if (xSize > 1 && align == Alignment.LEFT) {
-                        z = z - xSizeScaled;
+                        z = z - xSizeScaled + 1;
                     } else if (xSize > 1 && align == Alignment.CENTER) {
                         z = z - (xSizeScaled / 2);
                     }

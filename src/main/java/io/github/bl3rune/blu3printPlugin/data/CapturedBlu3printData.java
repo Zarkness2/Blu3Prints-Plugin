@@ -55,8 +55,12 @@ public class CapturedBlu3printData extends Blu3printData {
         int ySize = locY[1] - locY[0] + 1;
         int zSize = locZ[1] - locZ[0] + 1;
 
-        if (!playerAllowedToUse(player)) {
-            return;
+        Integer maxSize = GlobalConfig.getMaxSize();
+         if (player != null && maxSize != null && sizesExceedLimit(new int[] {xSize,ySize,zSize}, 1, maxSize)) {
+             if (!player.hasPermission("blu3print.no-size-limit")) {
+                 sendMessage(player,ChatColor.RED + "You do not have permission to set size over the max size limit of " + maxSize + "!");
+                 return;
+             }
         }
 
         List<String> ignoreBlocks = PlayerInteractListener.getIgnoreList(player);

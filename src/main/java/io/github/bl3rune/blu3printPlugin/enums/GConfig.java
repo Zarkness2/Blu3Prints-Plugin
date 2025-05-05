@@ -8,6 +8,11 @@ public enum GConfig {
     HOLOGRAM_TTL,
     ALIGNMENT("placement.alignment"),
     RELATIVE("placement.relative"),
+    FREE_PLACEMENT_MESSAGE("messaging.free-placement-message.enabled"),
+    FORCED_PLACEMENT_MESSAGE("messaging.force-placement-message.enabled"),
+    DISCOUNT_PLACEMENT_MESSAGE("messaging.discount-placement-message.enabled"),
+    UPDATE_AVAILABLE_MESSAGE("messaging.update-available-message.enabled"),
+    COOLDOWN_MESSAGE("messaging.cooldown-message.enabled"),
     ;
 
     private final String configPath;

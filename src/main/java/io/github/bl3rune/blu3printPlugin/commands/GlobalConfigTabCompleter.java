@@ -18,7 +18,7 @@ public class GlobalConfigTabCompleter implements TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             return Arrays.asList(GConfig.values()).stream().map(c -> c.name()).collect(Collectors.toList());
-        } else if (args.length == 2) {
+        } else if (args.length > 1) {
             try {
                 GConfig config = GConfig.valueOf(args[0]);
                 switch (config) {
@@ -37,6 +37,11 @@ public class GlobalConfigTabCompleter implements TabCompleter {
                     case ALIGNMENT:
                         return Arrays.asList(Alignment.values()).stream().map(a -> a.name()).collect(Collectors.toList());
                     case RELATIVE:
+                    case FREE_PLACEMENT_MESSAGE:
+                    case FORCED_PLACEMENT_MESSAGE:
+                    case DISCOUNT_PLACEMENT_MESSAGE:
+                    case UPDATE_AVAILABLE_MESSAGE:
+                    case COOLDOWN_MESSAGE:
                         return Arrays.asList("true", "false");
                     default:
                         break;

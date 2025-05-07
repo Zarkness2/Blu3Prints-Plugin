@@ -96,7 +96,6 @@ public class Hologram {
             a.setCanPickupItems(false);
             a.setMarker(true);
             a.setPersistent(false);
-            a.setRemoveWhenFarAway(true);
             a.setSmall(true);
             a.getEquipment().setHelmet(new ItemStack(data.getMaterial()));
             a.teleport(new Location(l.getWorld(), l.getX(), l.getY() - 0.5, l.getZ()));

@@ -5,7 +5,6 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.utils.EdgeCaseBlockUtils;
 import io.github.bl3rune.blu3printPlugin.utils.EncodingUtils;
 
@@ -16,11 +15,9 @@ import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.MODIFIER;
 
 public class ImportedBlu3printData extends Blu3printData {
 
-    public ImportedBlu3printData(Player player, String encodedString) {
+    public ImportedBlu3printData(Player player, String encodedString, String blu3printUUID) {
 
-        if (materialIgnoreList.isEmpty()) {
-            materialIgnoreList = GlobalConfig.getIgnoredMaterials();
-        }
+        materialIgnoreList = buildMaterialIgnoreList(player, blu3printUUID);
 
         this.encoded = encodedString;
         String header = EncodingUtils.getHeaderFromEncoding(encodedString);

@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
+import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Config;
 import io.github.bl3rune.blu3printPlugin.utils.InventoryUtils;
@@ -68,6 +70,10 @@ public class ConfigCommand implements CommandExecutor {
                 case HOLOGRAM_VIEW_Z:
                     ppbc = setHologramViewLayers(ppbc, args, config, player);
                     break;
+                case IGNORE_MATERIAL:
+                case ALLOW_MATERIAL:
+                    ppbc = modifyMaterialIgnoreList(ppbc, args, config, player);
+                    break;
                 default:
                     break;
             }
@@ -78,12 +84,13 @@ public class ConfigCommand implements CommandExecutor {
         return true;
     }
 
-    private PlayerBlu3printConfig setHologramViewLayers(PlayerBlu3printConfig ppbc,  String [] args, Config config, Player player) {
+    private PlayerBlu3printConfig setHologramViewLayers(PlayerBlu3printConfig ppbc, String[] args, Config config,
+            Player player) {
         if (args.length < 2 || (config == Config.HOLOGRAM_VIEW_XYZ && args.length < 4)) {
             player.sendMessage(ChatColor.RED + "Not enough arguments for setting hologram view layers");
             return null;
         }
-        int [] [] layers = ppbc.getHologramViewLayers();
+        int[][] layers = ppbc.getHologramViewLayers();
         switch (config) {
             case HOLOGRAM_VIEW_XYZ:
                 layers[0] = extractHologramViewLayers(args[1], player);
@@ -125,14 +132,15 @@ public class ConfigCommand implements CommandExecutor {
         return ppbc;
     }
 
-    private int [] extractHologramViewLayers(String arg, Player player) {
-        if (arg == null || arg.isBlank()) return null;
-        String [] seperated = arg.split(Pattern.quote(","));
+    private int[] extractHologramViewLayers(String arg, Player player) {
+        if (arg == null || arg.isBlank())
+            return null;
+        String[] seperated = arg.split(Pattern.quote(","));
         List<Integer> values = new ArrayList<>();
         for (String v : seperated) {
             try {
                 if (v.contains("-")) {
-                    String [] range = v.split(Pattern.quote("-"));
+                    String[] range = v.split(Pattern.quote("-"));
                     IntStream.rangeClosed(Integer.parseInt(range[0]), Integer.parseInt(range[1])).forEach(i -> {
                         values.add(i);
                     });
@@ -142,15 +150,16 @@ public class ConfigCommand implements CommandExecutor {
                         values.add(i);
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 player.sendMessage("Poorly formed argument : " + arg);
             }
         }
         return values.stream().mapToInt((a) -> a).toArray();
     }
 
-    private String arrayToString(int [] array) {
-        if (array == null) return "no limit";
+    private String arrayToString(int[] array) {
+        if (array == null)
+            return "no limit";
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (int i : array) {
@@ -162,4 +171,39 @@ public class ConfigCommand implements CommandExecutor {
         }
         return sb.toString();
     }
+
+    private PlayerBlu3printConfig modifyMaterialIgnoreList(PlayerBlu3printConfig ppbc, String[] args, Config config,
+            Player player) {
+        if (args.length < 2) {
+            player.sendMessage("Usage: /blu3print.config IGNORE_MATERIALS [material]");
+            return ppbc;
+        }
+        Material material; 
+        try {
+            material = Material.matchMaterial(args[1]);
+            if (material == null) {
+                player.sendMessage(ChatColor.RED + "Invalid material : " + args[1]);
+                return ppbc;
+            }
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "Invalid material : " + args[1]);
+            return ppbc;
+        }
+        
+        List<String> ignoredMaterials = ppbc.getIgnoredMaterials();
+        if (config == Config.IGNORE_MATERIAL) {
+            if (GlobalConfig.isVerboseLogging()) {
+                player.sendMessage(ChatColor.GREEN + "Added " + material.name() + " to ignore list");
+            }
+            ignoredMaterials.add(material.name().toUpperCase());
+        } else {
+            if (GlobalConfig.isVerboseLogging()) {
+                player.sendMessage(ChatColor.RED + "Remooved " + material.name() + " from ignore list");
+            }
+            ignoredMaterials.removeIf(m -> m.equalsIgnoreCase(material.name()));
+        }
+        ppbc.setIgnoredMaterials(ignoredMaterials);
+        return ppbc;
+    }
+
 }

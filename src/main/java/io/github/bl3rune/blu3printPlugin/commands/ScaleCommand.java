@@ -58,7 +58,7 @@ public class ScaleCommand implements CommandExecutor {
             String key = Blu3PrintPlugin.getBlu3PrintPlugin().getKeyFromEncoding(newEncoding);
             if (key == null) {
                 key = UUID.randomUUID().toString();
-                Blu3PrintPlugin.getBlu3PrintPlugin().saveOrUpdateCachedBlu3print(key, new ImportedBlu3printData(player, newEncoding));
+                Blu3PrintPlugin.getBlu3PrintPlugin().saveOrUpdateCachedBlu3print(key, new ImportedBlu3printData(player, newEncoding, key));
             }
             ItemMeta meta = item.getItemMeta();
             Blu3printItem newItem = Blu3printItem.getFinishedBlu3print(key, "modified by " + player.getDisplayName(), meta.getDisplayName(), false);

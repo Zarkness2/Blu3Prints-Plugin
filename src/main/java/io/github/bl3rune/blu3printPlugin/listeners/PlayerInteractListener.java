@@ -170,14 +170,15 @@ public class PlayerInteractListener implements Listener {
             player.sendMessage(ChatColor.RED + "Blu3print missing ID");
             return;
         }
-        Blu3printData blu3printItem = instance.getBlu3printFrpmCache(lore.get(1));
+        String blu3printUUID = lore.get(1);
+        Blu3printData blu3printItem = instance.getBlu3printFrpmCache(blu3printUUID);
         if (blu3printItem == null) {
             player.sendMessage(ChatColor.RED + "Blu3print ID missing from cache");
             return;
         }
 
         Location startLocation = block.getLocation();
-        blu3printItem.placeBlocks(player, startLocation, forced, onTop);
+        blu3printItem.placeBlocks(player, startLocation, forced, onTop, blu3printUUID);
     }
 
     private void placeHologram(Player player, Block block, ItemStack item) {

@@ -21,6 +21,8 @@ import io.github.bl3rune.blu3printPlugin.commands.GlobalConfigTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.HelpCommand;
 import io.github.bl3rune.blu3printPlugin.commands.ImportCommand;
 import io.github.bl3rune.blu3printPlugin.commands.NameCommand;
+import io.github.bl3rune.blu3printPlugin.commands.PlayerConfigCommand;
+import io.github.bl3rune.blu3printPlugin.commands.PlayerConfigTabCompleter;
 import io.github.bl3rune.blu3printPlugin.commands.RotateCommand;
 import io.github.bl3rune.blu3printPlugin.commands.RotateTabCompleter;
 
@@ -41,6 +43,7 @@ public enum CommandType {
     GIVE("give", new GiveCommand(), new GiveTabCompleter()),
     HELP("help", new HelpCommand()),
     CONFIG("config", new ConfigCommand(), new ConfigTabCompleter()),
+    PLAYER("player-config", new PlayerConfigCommand(), new PlayerConfigTabCompleter()),
     GLOBAL("global-config", new GlobalConfigCommand(), new GlobalConfigTabCompleter())
     ;
 

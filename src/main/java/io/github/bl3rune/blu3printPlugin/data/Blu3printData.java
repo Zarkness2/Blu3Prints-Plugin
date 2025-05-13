@@ -23,6 +23,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerConfig;
 import io.github.bl3rune.blu3printPlugin.enums.Alignment;
 import io.github.bl3rune.blu3printPlugin.enums.Orientation;
 import io.github.bl3rune.blu3printPlugin.enums.Rotation;
@@ -35,12 +37,13 @@ import static io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin.logger;
 
 public abstract class Blu3printData {
 
-    protected static List<String> materialIgnoreList = new ArrayList<>();
+    protected static List<String> globalMaterialIgnoreList = new ArrayList<>();
 
     protected MaterialData[][][] selectionGrid; // [z] [y] [x]
     protected Map<String, Integer> ingredientsCount; // key: material, value: count
     protected Map<String, String> ingredientsMap; // key: material, value: encoded
     protected Map<String, String> complexDataMap; // key: complex-mapping, value: complex-encoding
+    protected List<String> materialIgnoreList; // list of materials to ignore
     protected ManipulatablePosition position;
     protected String encoded;
 
@@ -90,10 +93,12 @@ public abstract class Blu3printData {
 
     // PLACING BLU3PRINT SECTION
 
-    public void placeBlocks(Player player, Location location, boolean forced, boolean onTop) {
+    public void placeBlocks(Player player, Location location, boolean forced, boolean onTop, String blu3printUUID) {
         if (!playerAllowedToUse(player)) {
             return;
         }
+        materialIgnoreList = buildMaterialIgnoreList(player, blu3printUUID);
+
         Function<Location, Location> calculateFinalLocation = buildCalculateFinalLocationFunction(player, location,
                 onTop);
         Map<String, Integer> blocksUnableToPlace = checkSpaceIsClear(calculateFinalLocation);
@@ -124,7 +129,7 @@ public abstract class Blu3printData {
 
             int scale = position.getScale();
             MaterialData data = selectionGrid[coords[0] / scale][coords[1] / scale][coords[2] / scale];
-            if (data == null || data.getMaterial() == null) {
+            if (data == null || data.getMaterial() == null || isIgnorable(data.getMaterial())) {
                 coords = position.next(true);
                 continue;
             }
@@ -132,7 +137,7 @@ public abstract class Blu3printData {
             Location placeLocation = calculateFinalLocation
                     .apply(new Location(location.getWorld(), coords[2], coords[1], coords[0]));
             Block block = placeLocation.getBlock();
-            if (block != null && !isBlockIgnorable(block)) {
+            if (block != null && !isIgnorable(block.getType())) {
                 coords = position.next(true);
                 continue;
             }
@@ -241,13 +246,13 @@ public abstract class Blu3printData {
         Map<String, Integer> blocksUnableToPlace = new HashMap<>();
         while (coords != null) {
             MaterialData materialData = this.selectionGrid[coords[0] / scale][coords[1] / scale][coords[2] / scale];
-            if (materialData == null || materialData.getName() == null) {
+            if (materialData == null || materialData.getName() == null || isIgnorable(materialData.getMaterial())) {
                 coords = position.next(true);
                 continue;
             }
             Location loc = calculateFinalLocation.apply(new Location(null, coords[2], coords[1], coords[0]));
             Block block = loc.getBlock();
-            if (block != null && !isBlockIgnorable(block)) {
+            if (block != null && !isIgnorable(block.getType())) {
                 Integer count = blocksUnableToPlace.getOrDefault(materialData.getMaterial().name(), 0);
                 blocksUnableToPlace.put(materialData.getMaterial().name(), count + 1);
             }
@@ -499,8 +504,35 @@ public abstract class Blu3printData {
         }
     }
 
-    protected boolean isBlockIgnorable(Block block) {
-        return block == null || block.isEmpty() || materialIgnoreList.contains(block.getType().name());
+    protected List<String> buildMaterialIgnoreList(Player player, String blu3printUUID) {
+        List<String> ignoreList = new ArrayList<>();
+        if (globalMaterialIgnoreList.isEmpty()) {
+            globalMaterialIgnoreList = GlobalConfig.getIgnoredMaterials();
+        }
+        if (player == null) {
+            return ignoreList;
+        }
+        String playerUUID = player.getUniqueId().toString();
+        PlayerBlu3printConfig pbc = Blu3PrintPlugin.getPlayerBlu3printConfig(playerUUID);
+        if (pbc != null) {
+            if (pbc.uuidMatches(blu3printUUID)) {
+                ignoreList.addAll(pbc.getIgnoredMaterials());
+            } else {
+                player.sendMessage(ChatColor.RED + "Cleared blu3print config as using different blu3print!");
+                Blu3PrintPlugin.setPlayerBlu3printConfig(playerUUID, null);
+            }
+        }
+        PlayerConfig pc = Blu3PrintPlugin.getPlayerConfig(playerUUID);
+        if (pc != null) {
+            ignoreList.addAll(pc.getIgnoredMaterials());
+        } 
+        return ignoreList;
+    }
+
+    protected boolean isIgnorable(Material material) {
+        return material == null || material.isAir()
+            || materialIgnoreList.contains(material.name().toUpperCase())
+            || globalMaterialIgnoreList.contains(material.name().toUpperCase());
     }
 
     

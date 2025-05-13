@@ -63,7 +63,7 @@ public class BookListener implements Listener {
                 uuid = cacheKey;
             }
             finishedBook = Blu3printItem.getFinishedBlu3print(uuid, "imported by " + player.getDisplayName(), bookMeta.getTitle(), true);
-            blu3printData = new ImportedBlu3printData(player, encodedString);
+            blu3printData = new ImportedBlu3printData(player, encodedString, uuid);
             if (blu3printData.getPosition() == null) return;
             bookMeta.setPages(new ArrayList<>());
             book.setItemMeta(bookMeta);
@@ -72,7 +72,7 @@ public class BookListener implements Listener {
             String pos1 = extractLocation(itemMeta,  "location1-" + playerUuid);
             String pos2 = extractLocation(itemMeta,  "location2-" + playerUuid);
             finishedBook = Blu3printItem.getFinishedBlu3print(uuid, "created by " + player.getDisplayName(), bookMeta.getTitle(), false);
-            blu3printData = new CapturedBlu3printData(player, pos1, pos2);
+            blu3printData = new CapturedBlu3printData(player, pos1, pos2, uuid);
             if (blu3printData.getPosition() == null) return;
         }
         instance.saveOrUpdateCachedBlu3print(uuid, blu3printData);

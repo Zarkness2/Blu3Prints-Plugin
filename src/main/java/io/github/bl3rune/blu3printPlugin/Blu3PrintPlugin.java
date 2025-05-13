@@ -31,6 +31,7 @@ import com.google.gson.stream.JsonReader;
 
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ImportedBlu3printData;
 import io.github.bl3rune.blu3printPlugin.enums.CommandType;
@@ -51,7 +52,8 @@ public final class Blu3PrintPlugin extends JavaPlugin {
     // Static Fields
     private static Blu3PrintPlugin instance;
     private static List<String> updateMessages = new ArrayList<>();
-    private static Map<String,PlayerBlu3printConfig> playerConfig = new HashMap<>(); // Clears on server restart
+    private static Map<String,PlayerConfig> playerConfig = new HashMap<>(); // Clears on server restart
+    private static Map<String,PlayerBlu3printConfig> playerBlu3printConfig = new HashMap<>(); // Clears on server restart
 
     public static Blu3PrintPlugin getBlu3PrintPlugin() {
         return instance;
@@ -61,15 +63,27 @@ public final class Blu3PrintPlugin extends JavaPlugin {
         return updateMessages;
     }
 
-    public static PlayerBlu3printConfig getPlayerBlu3printConfig(String playerUUID) {
+    public static PlayerConfig getPlayerConfig(String playerUUID) {
         return playerConfig.getOrDefault(playerUUID, null);
     }
 
-    public static void setPlayerBlu3printConfig(String playerUUID, PlayerBlu3printConfig ppbc) {
+    public static void setPlayerConfig(String playerUUID, PlayerConfig ppbc) {
         if (ppbc == null) {
             playerConfig.remove(playerUUID);
         } else {
             playerConfig.put(playerUUID, ppbc);
+        }
+    }
+
+    public static PlayerBlu3printConfig getPlayerBlu3printConfig(String playerUUID) {
+        return playerBlu3printConfig.getOrDefault(playerUUID, null);
+    }
+
+    public static void setPlayerBlu3printConfig(String playerUUID, PlayerBlu3printConfig ppbc) {
+        if (ppbc == null) {
+            playerBlu3printConfig.remove(playerUUID);
+        } else {
+            playerBlu3printConfig.put(playerUUID, ppbc);
         }
     }
 
@@ -242,7 +256,7 @@ public final class Blu3PrintPlugin extends JavaPlugin {
             }
             HashMap<String, Blu3printData> map = new HashMap<>();
             for (Entry<String, String> entry : entries.entrySet()) {
-                Blu3printData data = new ImportedBlu3printData(null, entry.getValue());
+                Blu3printData data = new ImportedBlu3printData(null, entry.getValue(), entry.getKey());
                 map.put(entry.getKey(), data);
             }
             getLogger().warning("Loaded Cached blu3prints from blu3prints.json");

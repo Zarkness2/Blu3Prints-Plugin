@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -15,11 +16,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import io.github.bl3rune.blu3printPlugin.Blu3PrintPlugin;
 import io.github.bl3rune.blu3printPlugin.config.GlobalConfig;
 import io.github.bl3rune.blu3printPlugin.config.PlayerBlu3printConfig;
+import io.github.bl3rune.blu3printPlugin.config.PlayerConfig;
 import io.github.bl3rune.blu3printPlugin.data.Blu3printData;
 import io.github.bl3rune.blu3printPlugin.data.ManipulatablePosition;
 import io.github.bl3rune.blu3printPlugin.data.MaterialData;
 
 public class Hologram {
+    
+    private static List<String> globalMaterialIgnoreList = new ArrayList<>();
 
     private Location location;
     private MaterialData [][][] selectionGrid;
@@ -27,20 +31,33 @@ public class Hologram {
     private List<ArmorStand> holograms; // List to hold the holograms
     private Function<Location,Location> calculateFinalLocationFunction;
     private PlayerBlu3printConfig config;
-
+    private List<String> materialIgnoreList;
 
     public Hologram(Player player, Location startLocation, Blu3printData data, String blu3printUuid) {
+        if  (globalMaterialIgnoreList.isEmpty()) {
+            globalMaterialIgnoreList = GlobalConfig.getIgnoredMaterials();
+        }
+        String playerUUID = player.getUniqueId().toString();
         this.location = new Location(startLocation.getWorld(), startLocation.getX(), startLocation.getY(), startLocation.getZ());
         this.selectionGrid = data.getSelectionGrid().clone();
         this.position = new ManipulatablePosition(data.getPosition(), data.getPosition().getScale());
         this.holograms = new ArrayList<>(); // Initialize the list of holograms
         calculateFinalLocationFunction = data.buildCalculateFinalLocationFunction(player, startLocation, true);
-        config = Blu3PrintPlugin.getPlayerBlu3printConfig(player.getUniqueId().toString());
-        if (config != null && !config.uuidMatches(blu3printUuid)) {
-            // Clear config
-            config = null;
-            Blu3PrintPlugin.setPlayerBlu3printConfig(player.getUniqueId().toString(), null);
-            player.sendMessage(ChatColor.RED + "Cleared blu3print config as using different blu3print!");
+        config = Blu3PrintPlugin.getPlayerBlu3printConfig(playerUUID);
+        this.materialIgnoreList = new ArrayList<>(); // Reset material ignore list
+        if (config != null) {
+            if (!config.uuidMatches(blu3printUuid)) {
+                // Clear config
+                config = null;
+                Blu3PrintPlugin.setPlayerBlu3printConfig(playerUUID, null);
+                player.sendMessage(ChatColor.RED + "Cleared blu3print config as using different blu3print!");
+            } else {
+                materialIgnoreList.addAll(config.getIgnoredMaterials());
+            }
+        }
+        PlayerConfig playerConfig = Blu3PrintPlugin.getPlayerConfig(playerUUID);
+        if (playerConfig != null) {   
+            materialIgnoreList.addAll(playerConfig.getIgnoredMaterials());
         }
     }
 
@@ -61,14 +78,14 @@ public class Hologram {
                 }
             }
             MaterialData data = selectionGrid[coords[0] / scale][coords[1] / scale][coords[2] / scale];
-            if (data == null || data.getMaterial() == null) {
+            if (data == null || data.getMaterial() == null || isIgnorable(data.getMaterial())) {
                 coords = position.next(true);
                 continue;
             }
             Location loc = calculateFinalLocationFunction.apply(new Location(location.getWorld(), coords[2], coords[1], coords[0]));
             Location placeLocation = new Location(loc.getWorld(), loc.getX() + 0.5, loc.getY() + 0.1, loc.getZ() + 0.5);
             Block block = placeLocation.getBlock();
-            if (block != null && !isBlockIgnorable(block)) {
+            if (block != null && !isIgnorable(block.getType())) {
                 coords = position.next(true);
                 continue;
             }
@@ -146,8 +163,10 @@ public class Hologram {
         this.holograms.forEach(a -> a.remove());
     }
 
-    private boolean isBlockIgnorable(Block block) {
-        return block == null || block.isEmpty();
+    private boolean isIgnorable(Material material) {
+        return material == null || material.isAir()
+            || materialIgnoreList.contains(material.name().toUpperCase())
+            || globalMaterialIgnoreList.contains(material.name().toUpperCase());
     }
     
 }

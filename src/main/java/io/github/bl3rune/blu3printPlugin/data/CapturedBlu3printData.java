@@ -27,11 +27,9 @@ import static io.github.bl3rune.blu3printPlugin.utils.EncodingUtils.COLUMN_END;
 
 public class CapturedBlu3printData extends Blu3printData {
 
-    public CapturedBlu3printData(Player player, String pos1, String pos2) {
+    public CapturedBlu3printData(Player player, String pos1, String pos2, String blu3printUUID) {
 
-        if (materialIgnoreList.isEmpty()) {
-            materialIgnoreList = GlobalConfig.getIgnoredMaterials();
-        }
+        materialIgnoreList = buildMaterialIgnoreList(player, blu3printUUID);
 
         Location loc1 = LocationUtils.getCoordsFromPosString(pos1);
         Location loc2 = LocationUtils.getCoordsFromPosString(pos2);
@@ -74,7 +72,7 @@ public class CapturedBlu3printData extends Blu3printData {
             for (int y = 0; y < ySize; y++) {
                 for (int x = 0; x < xSize; x++) {
                     Block block = Bukkit.getWorld(world).getBlockAt(locX[0] + x, locY[0] + y, locZ[0] + z);
-                    if (isBlockIgnorable(block) || ignoreBlocks.stream().anyMatch(
+                    if (block == null || isIgnorable(block.getType()) || ignoreBlocks.stream().anyMatch(
                                 i -> LocationUtils.locationsMatch(LocationUtils.getCoordsFromPosString(i), block.getLocation())
                             )) {
                         selectionGrid[z][y][x] = new ImportedMaterialData(null, Material.AIR, null, 1);

@@ -91,6 +91,8 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "##### Blu3Print Commands Help #####");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.help") + " for help with the plugin");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.give") + " or " + wrapCommand("/blu3print.help <player>") + " to give a Blu3print to a player");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.global-config") + " to change config for the plugin");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.player-config") + " to change player-level config for the plugin");
         player.sendMessage(ChatColor.WHITE + "While holding a completed Blu3print:");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print") + " to open the blu3print menu");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.name") + " to name the blu3print");
@@ -100,18 +102,24 @@ public class HelpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.turn <turn>") + " to turn the side of the blu3print facing you");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.duplicate") + " to duplicate the blu3print");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.scale") + " to change the scale of the blu3print");
+        player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.config") + " to change cnfiguration for this blu3print");
         player.sendMessage(ChatColor.WHITE + "While holding a Blu3print Writer:");
         player.sendMessage(ChatColor.GRAY + wrapCommand("/blu3print.import <name> <encoding>") + " to import a blu3print from text");
     }
 
     private void configHelp(Player player) {
         player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "##### Blu3Print Config Command Help #####");
+        player.sendMessage(ChatColor.YELLOW + "Use /blu3print.config to set Blu3print specific config");
+        player.sendMessage(ChatColor.YELLOW + "Use /blu3print.player-config to set player specific config");
+        player.sendMessage(ChatColor.YELLOW + "Use /blu3print.global-config to set Blu3print plugin config");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config") + " to set player blu3print config");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config CLEAR") + " to clear player blu3print config");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_XYZ 0-2 0 0-1") + " to set hologram for current blu3print to only show blocks in layers X 0,1,2 and Y 0 and Z 0,1");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_X 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the X layers 0,2,3,5,6,7");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_Y 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the Y layers 0,2,3,5,6,7");
         player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config HOLOGRAM_VIEW_Z 0,2-3,5-7") + " to set hologram for current blu3print to only show blocks in the Z layers 0,2,3,5,6,7");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config IGNORE_MATERIAL <material>") + " to ignore material when capturing/placing/previewing blu3prints");
+        player.sendMessage(ChatColor.GRAY + "Type " + wrapCommand("/blu3print.config ALLOW_MATERIAL <material>") + "  to remove material from ignore list");
 
     }
 

@@ -2,8 +2,8 @@ blu3print:
   max-scale: 10 # Maximum scale of a Blu3Print
   max-size: 100 # Maximum size of a Blu3Print
   max-overall-size: 200 # Maximum size * scale of a Blu3Print
-  cooldown: 500 # Cooldown in ms between two Blu3print usages
-  hologram-ttl: 10 # Time in seconds until a hologram disappears after being placed
+  cooldown: 600 # Cooldown in ms between two Blu3print usages
+  hologram-ttl: 8 # Time in seconds until a hologram disappears after being placed
   recipe: # Recipe for crafting a Blu3Print
     ingredients:
       - PAPER

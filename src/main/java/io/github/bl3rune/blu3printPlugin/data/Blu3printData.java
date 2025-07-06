@@ -273,8 +273,9 @@ public abstract class Blu3printData {
         Map<String, Integer> ingCountCopy = new HashMap<>(ingredientsCount);
 
         // Discount blocks unable to place
-        if (player.isSneaking() && player.hasPermission("blu3print.force-place-discount")) {
-            if (GlobalConfig.isDiscountPlacementMessageEnabled()) {
+        boolean forcePlacePenalty = GlobalConfig.getForcePlacePenaltyEnabled();
+        if (player.isSneaking() && (player.hasPermission("blu3print.force-place-discount") || !forcePlacePenalty)) {
+            if (GlobalConfig.isDiscountPlacementMessageEnabled() && forcePlacePenalty) {
                 sendMessage(player, ChatColor.GREEN + "Placing Blu3print for discount as blocks in the way!");
             }
             blocksUnableToPlace.forEach((material, amount) -> {

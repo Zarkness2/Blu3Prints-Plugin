@@ -20,6 +20,7 @@ public class GlobalConfig {
     // Placement
     private static Alignment alignment = null;
     private static boolean relativePlacement = false;
+    private static boolean forcePlacePenalty = true;
     // Messages
     private static boolean freePlacementMessageEnabled = false;
     private static boolean forcePlacementMessageEnabled = false;
@@ -45,6 +46,7 @@ public class GlobalConfig {
         // Placement settings
         alignment = tryAndGetConfigEnum("blu3print.placement.alignment", Alignment.class);
         relativePlacement = tryAndGetConfigFlag("blu3print.placement.relative");
+        forcePlacePenalty = tryAndGetConfigFlag("blu3print.placement.force-place-penalty");
         // Message settings
         freePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.free-placement-message.enabled");
         forcePlacementMessageEnabled = tryAndGetConfigFlag("blu3print.messaging.force-placement-message.enabled");
@@ -154,6 +156,10 @@ public class GlobalConfig {
         return relativePlacement;
     }
 
+    public static boolean getForcePlacePenaltyEnabled() {
+        return forcePlacePenalty;
+    }
+
     public static boolean isFreePlacementMessageEnabled() {
         return freePlacementMessageEnabled;
     }
@@ -191,5 +197,9 @@ public class GlobalConfig {
             return 24;
         }
         return updateCheckInterval;
+    }
+
+    public static boolean isForcePlacePenalty() {
+        return forcePlacePenalty;
     }
 }

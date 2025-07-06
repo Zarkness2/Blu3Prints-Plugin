@@ -16,6 +16,7 @@ blu3print:
   placement:
     alignment: center # left / center / right
     relative: true  # true / false  -  should place from direction player facing
+    force-place-penalty: true # true / false - globla toggle for force placement penalty functionality
   messaging: # Fine tune messaging for the Blu3Print plugin
     free-placement-message:
       enabled: true

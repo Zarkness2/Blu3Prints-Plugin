@@ -10,8 +10,10 @@ public enum GConfig {
     MAX_OVERALL_SIZE(GlobalConfig::getMaxOverallSize),
     COOLDOWN(GlobalConfig::getCooldown),
     HOLOGRAM_TTL(GlobalConfig::getHologramTtl),
+    // Placement
     ALIGNMENT(GlobalConfig::getAlignment, "placement.alignment"),
     RELATIVE(GlobalConfig::getRelativePlacement, "placement.relative"),
+    FORCE_PLACE_PENALTY(GlobalConfig::getForcePlacePenaltyEnabled, "placement.force-place-penalty"),
     // Messaging
     FREE_PLACEMENT_MESSAGE(GlobalConfig::isFreePlacementMessageEnabled, "messaging.free-placement-message.enabled"),
     FORCED_PLACEMENT_MESSAGE(GlobalConfig::isForcePlacementMessageEnabled, "messaging.force-placement-message.enabled"),

@@ -14,12 +14,48 @@ import org.bukkit.block.BlockFace;
  */
 public enum Orientation {
 
-    EAST(BlockFace.EAST,12),
-    WEST(BlockFace.WEST,4),
-    NORTH(BlockFace.NORTH,8),
-    SOUTH(BlockFace.SOUTH,0),
-    UP(BlockFace.UP,0),
-    DOWN(BlockFace.DOWN,0);
+    EAST (
+        BlockFace.EAST,
+        12,
+        Direction.X_POS,
+        Direction.Y_POS,
+        Direction.Z_POS
+    ),
+    WEST (
+        BlockFace.WEST,
+        4,
+        Direction.X_NEG,
+        Direction.Y_POS,
+        Direction.Z_NEG
+    ),
+    NORTH (
+        BlockFace.NORTH,
+        8,
+        Direction.Z_NEG,
+        Direction.Y_POS,
+        Direction.X_POS
+    ),
+    SOUTH (
+        BlockFace.SOUTH,
+        0,
+        Direction.Z_POS,
+        Direction.Y_POS,
+        Direction.X_NEG
+    ),
+    UP (
+        BlockFace.UP,
+        0,
+        Direction.X_POS,
+        Direction.Z_POS,
+        Direction.Y_POS
+    ),
+    DOWN (
+        BlockFace.DOWN,
+        0,
+        Direction.X_NEG,
+        Direction.Z_NEG,
+        Direction.Y_NEG
+    );
 
     private final BlockFace blockFace;
     private final String description;
@@ -27,14 +63,20 @@ public enum Orientation {
     private final String directionalShort;
     private final String rotatable;
     private final String rotatableShort;
+    private final Direction outer;
+    private final Direction middle;
+    private final Direction inner;
 
-    Orientation(BlockFace bf, int rotatable) {
+    Orientation(BlockFace bf, int rotatable, Direction outer, Direction middle, Direction inner) {
         this.blockFace = getCartesianBlockFace(bf);
         this.description = this.blockFace.name().substring(0, 1);
         this.directional = "facing=" + this.blockFace.name().toLowerCase();
         this.directionalShort = "f=" + this.description.toLowerCase();
         this.rotatable = "rotation=" + Integer.toString(rotatable);
         this.rotatableShort = "r=" + Integer.toString(rotatable);
+        this.outer = outer;
+        this.middle = middle;
+        this.inner = inner;
     }
 
     public BlockFace getBlockFace() {
@@ -60,6 +102,32 @@ public enum Orientation {
     public String getRotatableShort() {
         return rotatableShort;
     }
+
+    public Direction getOuter() {
+        return outer;
+    }
+
+    /*
+     * Applies roatation to the directions based on these rules:
+     * - ROTATION TOP = (outer) (middle) (inner)
+     * - ROTATION RIGHT = (outer) -(inner) (middle)
+     * - ROTATION BOTTOM = (outer) -(middle) -(inner)
+     * - ROTATION LEFT = (outer) (inner) -(middle)
+     */
+
+    public Direction getMiddle(Rotation r) {
+        if (r.isHorizontal()) {
+            return r == Rotation.RIGHT ? inner : inner.getInverted();
+        }
+        return r == Rotation.TOP ? middle : middle.getInverted();
+    }
+
+    public Direction getInner(Rotation r) {
+        if (r.isHorizontal()) {
+            return r == Rotation.LEFT ? middle : middle.getInverted();
+        }
+        return r == Rotation.TOP ? inner : inner.getInverted();
+    } 
 
     public Orientation getOpposite() {
         BlockFace blockFace = getCartesianBlockFace(getBlockFace());
